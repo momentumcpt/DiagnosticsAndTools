@@ -30,8 +30,7 @@ def pick_out(ncases, cases,years, nsite,lats, lons,area, filepath,casedir):
 
  for im in range(0,ncases):
     
-     #infile=filepath[im]+cases[im]+'/run/'+cases[im]+'.cam.h0.'+years[im]+'-01.nc'
-     infile=filepath[im]+cases[im]+'.cam.h0.'+years[im]+'-01.nc'
+     infile=filepath[im]+cases[im]+'.cam.h0.'+str(years[im]).rjust(4,'0')+'-01.nc'
 
      print(infile)
      print(im)
@@ -46,8 +45,8 @@ def pick_out(ncases, cases,years, nsite,lats, lons,area, filepath,casedir):
      cols=[0,1,2,3,4]
      sits=np.linspace(0,nsite-1,nsite)
 
-     txtfile1=filepath[im]+'diff*.asc'
-     txtfile2=filepath[im]+'log*.asc'
+     txtfile1=filepath[im]+cases[im]+'/run/diff*.asc'
+     txtfile2=filepath[im]+cases[im]+'/run/log*.asc'
      os.system('mkdir '+ casedir+'/txt/')
      os.system('cp -f '+ txtfile1+ ' '+ casedir+'/txt/')
      os.system('cp -f '+ txtfile2+ ' '+ casedir+'/txt/')

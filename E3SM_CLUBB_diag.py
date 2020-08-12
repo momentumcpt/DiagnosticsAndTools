@@ -11,45 +11,48 @@ Main code to make 1) 2D plots,2) profiles, 3) budgets on selected stations,
 # Begin User Defined Settings
 # User defined name used for this comparison, this will be the name 
 #   given the directory for these diagnostics
-case='test3' # A general case name
+case='paper4' # A general case name
 outdir='/lcrc/group/acme/zhun/plots/' # Location of plots
 
-filepath=['/lcrc/group/acme/zhun/E3SM_simulations/',\
+filepath=[ \
+'/lcrc/group/acme/ac.zguo/E3SM_simulations/',\
+'/lcrc/group/acme/ac.zguo/E3SM_simulations/',\
+'/lcrc/group/acme/ac.zguo/E3SM_simulations/',\
+'/lcrc/group/acme/ac.zguo/E3SM_simulations/',\
+'/lcrc/group/acme/ac.zguo/E3SM_simulations/',\
 '/lcrc/group/acme/zhun/E3SM_simulations/',\
-'/lcrc/group/acme/zhun/E3SM_simulations/',\
-'/lcrc/group/acme/zhun/E3SM_simulations/',\
-'/lcrc/group/acme/zhun/E3SM_simulations/',\
-'/lcrc/group/acme/zhun/E3SM_simulations/',\
-
           ]
-
 cases=[ \
-#       'anvil-centos7.base.newbase_damp300.ne16_ne16',\
-'anvil-centos7.base.newbase_damp5_bkgp1_shearp3_xp2.ne16_ne16',\
-'anvil-centos7.master_20191113.gust_polun_run3.ne16_ne16',\
-'anvil-centos7.master_20191113.FC5CLBMG2BCL72_zm.ne16_ne16',\
+'anvil.EAMv1.F2010SC5-CMIP6_t1.ne30_ne30',\
+'anvil-centos7.base2.wpxpri_3p3e4_1_3_0_12_C7ri.ne30_ne30',\
+'anvil.EAMv1.FC5AV1C.ne30_ne30',\
+'anvil-centos7.base2.wpxpri_3p3e4_1_3_0_12_C7ri_FC5AV1C.ne30_ne30',\
+'anvil-centos7.base2.wpxpri_3p35e4_1_2p5_0_12_C7ri_F2010SC5-CMIP6.ne30_ne30',\
 ]
 
        
 # Give a short name for your experiment which will appears on plots
 
-#casenames=['arc4_prc3_1p2_wp3_wpxp1_n2p5','arc4_prc3_1p2_wp3_wpxp1_n2p45_c61p5','arc4_prc3_1p2_wp3_wpxp1_n2p5_c1c61p5','arc4_prc3','ZM']
 casenames=[
-'base(i.e. altitude_threshold=300)',\
-'newbase_damp=5_xp2=wp2=0_bkg=p1_shear=p3',\
-'Poluns ZM tuning',\
-'ZM standard',\
+'EAMv1.F2010SC5-CMIP6',\
+'wpxpri_3p3e4_1_3_0_12_C7ri',\
+'EAMv1.FC5AV1C',\
+'wpxpri_3p3e4_1_3_0_12_C7ri_FC5AV1C',\
+'wpxpri_3p35e4_1_2p5_0_12_C7ri_F2010SC5-CMIP6',\
 ]
 
 years=[\
-        '0001', '0001','0001', '0001','0001','0001']
+        1, 1, 1, 1,1,1]
+nyear=[\
+        10, 5, 1, 5,3,1]
+
 dpsc=[\
-      'none','none','zm','zm','none','none']
+      'none','none','none','none','none','none']
 # NOTE, dpsc,deep scheme, has to be 'none', if silhs is turned on. 
 
 # Observation Data
 #filepathobs='/global/project/projectdirs/m2689/zhun/amwg/obs_data_20140804/'
-filepathobs='/blues/gpfs/home/zhun/amwg_diag_20140804/obs_data_20140804/'
+filepathobs='/blues/gpfs/home/ac.zguo/amwg_diag_20140804/obs_data_20140804/'
 #------------------------------------------------------------------------
 # Setting of plots.
 ptype         ='png'   # eps, pdf, ps, png, x11, ... are supported by this package
@@ -57,13 +60,12 @@ cseason       ='ANN' # Seasons, or others
 casename      =case+'_'+cseason
 
 #------------------------------------------------------------------------
-calmean          = False       # make mean states
+calmean          = True       # make mean states
 findout          = True       # pick out the locations of your sites
 draw2d           = True       # 2D plots, SWCF etc.
-drawclm          = False      # Plots of global land surface?
 drawlarge        = True       # profiles for large-scale variable on your sites 
 drawclubb        = True       # profiles for standard clubb output
-drawskw          = True       # profiles for skewness functions
+drawskw          = False       # profiles for skewness functions
 drawrain         = True       # profiles for SNOW, Rain etc.
 drawbgt          = True       # budgets of CLUBB prognostic Eqs 
 drawe3smbgt      = True       # budgets of e3sm tendency
@@ -82,9 +84,9 @@ area  = 1.
 # lats - area < lat(ncol) < lons + area .and. lons- area < lon(ncol) < lons + area
 #------------------------------------------------------------------------
 # Please give the lat and lon of sites here.
-# sites    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   17   18   19   20   21   23   24   25   26   27   28   29   30
-lats = [  20,  27, -20, -20,  -5,  -1,  60,   2,   9,   56,  45,   0,  10,  20,   0,   5,   9, -60,   0,   0, -45, -75,  30,  25 , 70 , 15,  17,  13,  36]
-lons = [ 190, 240, 275, 285, 355, 259,  180, 140, 229, 311, 180, 295,  90, 205, 325, 280, 170, 340, 305,  25,  90,  90,  90, 105 , 90, 300, 300, 300, 263]
+# sites    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   17   18   19   20   21   23   24   25   26   27   28   29   30  31  32 33
+lats = [  20,  27, -20, -20,  -5,  -1,  60,   2,   9,   56,  45,   0,  10,  20,   0,   5,   9, -60,   0,   0, -45, -75,  30,  25 , 70 , 15,  17,  13,  36, 28, 29, 30, 27 , 30, 27]
+lons = [ 190, 240, 275, 285, 355, 259,  180, 140, 229, 311, 180, 295,  90, 205, 325, 280, 170, 340, 305,  25,  90,  90,  90, 105 , 90, 300, 300, 300, 263, 240,240, 240 , 242, 238, 238 ]
 
 
 #========================================================================
@@ -116,7 +118,6 @@ import draw_e3sm_budget
 import Common_functions
 import Diagnostic_webpage
 
-
 casedir=outdir+casename
 
 if not os.path.exists(casedir):
@@ -124,7 +125,7 @@ if not os.path.exists(casedir):
 
 if calmean:
     print('Getting climatological mean')
-    function_cal_mean.cal_mean(ncases, cases, years,nsite, lats, lons, area, filepath)
+    function_cal_mean.cal_mean(ncases, cases, years,nyear, nsite, lats, lons, area, filepath)
 
 if findout:
     print('Find out the sites')
@@ -135,11 +136,6 @@ if draw2d:
     plot2d=draw_plots_hoz_2D.draw_2D_plot(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir)
     clevel=500
     plot3d=draw_plots_hoz_3D.draw_3D_plot(ptype,clevel,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir)
-
-if drawclm:
-    print('Drawing CLM')
-    plotclm=draw_plots_hoz_clm.draw_clm_plot(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir)
-
 
 if drawlarge:
     print('Drawing Large-scale variables on selected sites')
@@ -174,13 +170,11 @@ if drawclubb:
     pname = 'std4'
     plotstd4=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)
 
-
 #    pname = 'Tau'
-#    varis   = [ 'tau_no_N2_zm','tau_zm','tau_wp2_zm','tau_xp2_zm','tau_wp3_zm',  'em','bv_freq_sqd']
-#    cscale  = [      1E3,         1E3,         1E3,           1E3,         1E3,   1E3,   1,           1,1]
-#    chscale = [   '1E-3',      '1E-3',      '1E-3',        '1E-3',      '1E-3', '1E-3', '1',          '1']
+#    varis   = [ 'invrs_tau_bkgnd','invrs_tau_shear','invrs_tau_sfc','tau_no_N2_zm','tau_zm','tau_wp2_zm','tau_xp2_zm','tau_wp3_zm',  'bv_freq_sqd']
+#    cscale  = [               1E3,              1E3,            1E3,           1E3,     1E3,         1E3,         1E3,         1E3,            1E3]
+#    chscale = [            '1E-3',           '1E-3',         '1E-3',        '1E-3',  '1E-3',      '1E-3',      '1E-3',      '1E-3',         '1E-3']
 #    plottau=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)
-
 
 if drawskw:
     print('Drawing CLUBB skewness functions on selected sites')
@@ -293,8 +287,6 @@ if makeweb:
 
     if (draw2d):
         plot2d.extend(plot3d[:])
-        if (drawclm):
-            plot2d.extend(plotclm[:])
 
         Diagnostic_webpage.sets_web(casename,casedir,plot2d,'2D',\
 				'Horizontal Plots','1000','1000')
@@ -331,7 +323,7 @@ if makeweb:
         if (drawmicrobgt):
            for im in range (0, ncases ):
                plotclb.append(plotmicrobgt1[ire*ncases+im])
-               plotclb.append(plotmicrobgt2[ire*ncases+im])
+#               plotclb.append(plotmicrobgt2[ire*ncases+im])
 
         if (drawe3smbgt):
            for im in range (0, ncases ):
