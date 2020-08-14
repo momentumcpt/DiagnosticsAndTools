@@ -68,6 +68,7 @@ drawclubb        = True       # profiles for standard clubb output
 drawskw          = False       # profiles for skewness functions
 drawrain         = True       # profiles for SNOW, Rain etc.
 drawbgt          = True       # budgets of CLUBB prognostic Eqs 
+drawtaubgt       = True       # budgets of invrs tau
 drawe3smbgt      = True       # budgets of e3sm tendency
 drawmicrobgt     = False       # budgets of MG2
 drawaero         = False       # AERO for cloud brone
@@ -112,6 +113,7 @@ import draw_silhs_standard
 import draw_clubb_standard
 import draw_clubb_budget
 import draw_hollfiller
+import draw_clubb_tau
 import draw_rain 
 import draw_micro_budget
 import draw_e3sm_budget
@@ -170,11 +172,16 @@ if drawclubb:
     pname = 'std4'
     plotstd4=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)
 
-#    pname = 'Tau'
-#    varis   = [ 'invrs_tau_bkgnd','invrs_tau_shear','invrs_tau_sfc','tau_no_N2_zm','tau_zm','tau_wp2_zm','tau_xp2_zm','tau_wp3_zm',  'bv_freq_sqd']
-#    cscale  = [               1E3,              1E3,            1E3,           1E3,     1E3,         1E3,         1E3,         1E3,            1E3]
-#    chscale = [            '1E-3',           '1E-3',         '1E-3',        '1E-3',  '1E-3',      '1E-3',      '1E-3',      '1E-3',         '1E-3']
-#    plottau=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)
+if drawtaubgt:
+    print('tau')
+    pname = 'taubgt'
+
+    vname   = [ "no_N2", "~F10~w'x'~N~~F25~","~F10~w'~S~2~N~~F25~","~F10~x'~S~2~N~~F25~"]
+    varis   = [ 'tau_no_N2_zm', 'tau_wp3_zm', 'tau_wp2_zm', 'tau_xp2_zm']
+
+    cscale  = [               1E3,              1E3,            1E3,           1E3,     1E3,         1E3,         1E3,         1E3,            1E3]
+    chscale = [            '10~S~-3~N~',      '10~S~-3~N~', '10~S~-3~N~',        '10~S~-3~N~',  '1E-3',      '1E-3',      '1E-3',      '1E-3',         '1E-3']
+    plottaubgt=draw_clubb_tau.draw_clubb_tau(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname)
 
 if drawskw:
     print('Drawing CLUBB skewness functions on selected sites')
@@ -302,7 +309,6 @@ if makeweb:
            plotclb.append(plotstd2[ire])
            plotclb.append(plotstd3[ire])
            plotclb.append(plotstd4[ire])
-#           plotclb.append(plottau[ire])
 
         if (drawskw):
            plotclb.append(plotskw[ire])
@@ -328,6 +334,10 @@ if makeweb:
         if (drawe3smbgt):
            for im in range (0, ncases ):
                plotclb.append(plote3smbgt[ire*ncases+im])
+
+        if (drawtaubgt):
+           for im in range (0, ncases ):
+               plotclb.append(plottaubgt[ire*ncases+im])
 
         if (drawbgt):
            for im in range (0, ncases ):
