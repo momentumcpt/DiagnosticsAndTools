@@ -150,7 +150,7 @@ def rain_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepa
      txres.txFontHeightF = 0.020
      txres.txFont = _Font
      Ngl.text_ndc(wks,pname+' at'+ str(lons[ire])+'E,'+str(lats[ire])+'N',0.5,0.92+ncases*0.01,txres)
-     Common_functions.create_legend(wks,casenames,np.arange(3,20,2),0.1,0.89+ncases*0.01)
+     Common_functions.create_legend(wks,casenames,0.02,np.arange(3,20,2),0.1,0.89+ncases*0.01)
 
      Ngl.panel(wks,plot[:],[nvaris/2,2],pres)
      Ngl.frame(wks)

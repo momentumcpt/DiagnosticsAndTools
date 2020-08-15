@@ -77,19 +77,21 @@ def make_tarfile(output_filename,source_dir):
 
     return make_tarfile
 
-def create_legend(wks,labels,colors,dx,dy):
+
+def create_legend(wks,labels,Fontheight,colors,dx,dy):
 
     nlabs = len(labels)
 
     txres               =  Ngl.Resources()
-    txres.txFontHeightF =  0.014                #-- default size is HUGE!
+    txres.txFontHeightF =  Fontheight           #-- default size is HUGE!
+    txres.txFont        =  25
     txres.txJust        = "CenterLeft"          #-- puts text on top of bars
 
     plres               =  Ngl.Resources()
     plres.gsLineThicknessF =  2.0               #-- set line thickness
 
     x, y = np.array([0.0,0.02]),np.array([0.0,0.0])
-    dtx, ddy = 0.03, 0.02
+    dtx, ddy = 0.03, 0.03
 
     for i in range(0,nlabs):
         plres.gsLineColor   =  colors[i]        #-- set line color
