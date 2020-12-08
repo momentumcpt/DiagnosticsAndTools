@@ -26,8 +26,8 @@ def cal_mean(ncases, cases,years,nyear, nsite,lats, lons,area, filepath):
      datalocal = filepath[im] 
      print(datalocal)
    #  ncea_str='/global/common/sw/cray/cnl7/haswell/nco/4.7.9/gcc/8.2.0/unbt25h/bin/ncea '
-     ncea_str='/blues/gpfs/home/software/spack-0.10.1/opt/spack/linux-centos7-x86_64/intel-17.0.4/nco-4.7.4-x4y66ep2ydoyegnckicvv5ljwrheniun/bin/ncea '
-   #  ncea_str='/glade/u/apps/ch/opt/nco/4.7.9/gnu/8.3.0/bin/ncea '
+   #  ncea_str='/blues/gpfs/home/software/spack-0.10.1/opt/spack/linux-centos7-x86_64/intel-17.0.4/nco-4.7.4-x4y66ep2ydoyegnckicvv5ljwrheniun/bin/ncea '
+     ncea_str='/glade/u/apps/ch/opt/nco/4.7.9/gnu/8.3.0/bin/ncea '
 
      outfile=filepath[im]+'/'+cases[im]+'_DJF_climo.nc'
      infile=' '

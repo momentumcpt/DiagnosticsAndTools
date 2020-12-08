@@ -213,7 +213,7 @@ def draw_3D_plot (ptype,clevel,cseason, ncases, cases, casenames, nsite, lats, l
        nlat=len(lat)
        lon=inptrs.variables['lon'][:]
        nlon=len(lon)
-       area=inptrs.variables['area'][:]
+       #area=inptrs.variables['area'][:]
        lev=inptrs.variables['lev'][:]
        lev_idx = np.abs(lev - clevel).argmin()
 
@@ -250,7 +250,8 @@ def draw_3D_plot (ptype,clevel,cseason, ncases, cases, casenames, nsite, lats, l
        res.mpMinLonF    = min(lon) 
        res.mpMinLatF    = min(lat) 
        res.mpMaxLatF    = max(lat) 
-       res.tiMainString    =  "GLB="+str(np.sum(A_xy[:]*area[:]/np.sum(area)))
+       #res.tiMainString    =  "GLB="+str(np.sum(A_xy[:]*area[:]/np.sum(area)))
+       res.tiMainString    =  "GLB="
        textres.txFontHeightF = 0.015
        Ngl.text_ndc(wks,alpha[im]+"  "+ casenames[im],0.3,.135-im*0.03,textres)
 

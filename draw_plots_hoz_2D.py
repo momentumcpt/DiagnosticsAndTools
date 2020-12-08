@@ -212,7 +212,8 @@ def draw_2D_plot (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, fi
        nlat=len(lat)
        lon=inptrs.variables['lon'][:]
        nlon=len(lon)
-       area=inptrs.variables['area'][:]
+       #var area not in fv history files
+       #area=inptrs.variables['area'][:]
 
        area_wgt = np.zeros(nlat)
 
@@ -222,15 +223,9 @@ def draw_2D_plot (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, fi
        idx_cols=ncdf.variables['idx_cols'][:]
        if (varis[iv] == 'PRECT'):
            A = inptrs.variables['PRECC'][0,:]+inptrs.variables['PRECL'][0,:]
-       else:
-           A = inptrs.variables[varis[iv]][0,:]
-
-       if (varis[iv] == 'FLUT'):
+       elif (varis[iv] == 'FLUT'):
            A = inptrs.variables['FLUT'][0,:]-inptrs.variables['FLNS'][0,:]
-       else:
-           A = inptrs.variables[varis[iv]][0,:]
-
-       if (varis[iv] == 'U10'):
+       elif (varis[iv] == 'U10'):
            A = inptrs.variables['U10'][0,:]*inptrs.variables['U10'][0,:]
            A = np.sqrt(A)
        else:
@@ -263,7 +258,10 @@ def draw_2D_plot (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, fi
        res.mpMinLonF    = min(lon) 
        res.mpMinLatF    = min(lat) 
        res.mpMaxLatF    = max(lat) 
-       res.tiMainString    =  'GLB='+str(np.sum(A_xy[:]*area[:]/np.sum(area)))
+       # The FV history files don't include an area field, so I'm just removing the 
+       # area calculation for this title
+       #res.tiMainString    =  'GLB='+str(np.sum(A_xy[:]*area[:]/np.sum(area)))
+       res.tiMainString = 'GLB'
        textres.txFontHeightF = 0.015
        Ngl.text_ndc(wks,alpha[im]+'  '+ casenames[im],0.3,.135-im*0.03,textres)
 

@@ -14,7 +14,7 @@ import Common_functions
 import os
 from subprocess import call
 
-def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs, casedir):
+def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs, casedir, dofv):
 
 
 # ncases, the number of models
@@ -165,17 +165,30 @@ def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons,
              ncdf= Dataset(ncdfs[im],'r')
              n   =ncdf.variables['n'][:]
              idx_cols=ncdf.variables['idx_cols'][:,:]
+             if (dofv):
+               idx_lats=ncdf.variables['idx_coord_lat'][:,:]
+               idx_lons=ncdf.variables['idx_coord_lon'][:,:]
              ncdf.close()
+             theunits = "[units]"
              if (im ==0 ):
                  A_field = np.zeros((ncases,nlev),np.float32)
 
              for subc in range( 0, n[ire]):
                  npoint=idx_cols[ire,n[subc]-1]-1
+                 if(dofv):
+                  npointlat=idx_lats[ire,0]
+                  npointlon=idx_lons[ire,0]
                  if (varis[iv] == 'THETA'):
-                     tmp = inptrs.variables['T'][0,:,npoint]
+                     if (dofv):
+                       tmp = inptrs.variables['T'][0,:,npointlat,npointlon]
+                     else:
+                       tmp = inptrs.variables['T'][0,:,npoint]
                      hyam =inptrs.variables['hyam'][:]
                      hybm =inptrs.variables['hybm'][:]
-                     ps=inptrs.variables['PS'][0,npoint] 
+                     if (dofv):
+                       ps=inptrs.variables['PS'][0,npointlat,npointlon] 
+                     else:
+                       ps=inptrs.variables['PS'][0,npoint] 
                      ps=ps
                      p0=100000.0  #CAM uses a hard-coded p0
                      pre = np.zeros((nlev),np.float32)
@@ -185,8 +198,12 @@ def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons,
                      theunits=str(cscale[iv])+"x"+inptrs.variables['T'].units
 
                  else:
-                     tmp=inptrs.variables[varis[iv]][0,:,npoint] 
+                     if(dofv):
+                       tmp=inptrs.variables[varis[iv]][0,:,npointlat,npointlon] 
+                     else:
+                       tmp=inptrs.variables[varis[iv]][0,:,npoint] 
                      theunits=str(cscale[iv])+"x"+inptrs.variables[varis[iv]].units
+                 ##import pdb; pdb.set_trace()
                  A_field[im,:] = (A_field[im,:]+tmp[:]/n[ire]).astype(np.float32 )
 
              A_field[im,:] = A_field[im,:] *cscale[iv]

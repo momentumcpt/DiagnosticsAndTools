@@ -12,18 +12,19 @@ Main code to make 1) 2D plots,2) profiles, 3) budgets on selected stations,
 # User defined name used for this comparison, this will be the name 
 #   given the directory for these diagnostics
 #case="anvil-centos7.master_20191113.FC5CLBMG2BCL72_zm.ne16_ne16" # A general case name
-case="Diags_output_test_ne16_02"
+#case="Diags_output_test_ne16_02"
+case="Diags_output_test_f09_01"
 outdir="/glade/work/katec/momentumcpt/diagout/" # Location of plots
-
-filepath=['/glade/scratch/katec/archive/Diags_output_test_ne16_02/atm/hist/']
-
-cases=[ 'Diags_output_test_ne16_02' ]
+#filepath=['/glade/scratch/katec/archive/Diags_output_test_ne16_02/atm/hist/']
+filepath=['/glade/scratch/katec/archive/Diags_output_test_f09_01/atm/hist/']
+#cases=[ 'Diags_output_test_ne16_02' ]
+cases=[ 'Diags_output_test_f09_01' ]
        
 # Give a short name for your experiment which will appears on plots
 
 casenames=['kt_test1']
 
-years=[0]
+years=[1]
 nyear=[1]
 
 dpsc=['zm']
@@ -40,15 +41,16 @@ cseason       ='ANN' # Seasons, or others
 casename      =case+'_'+cseason
 
 #------------------------------------------------------------------------
+calfvsite        = True       # Calculate site indexes for FV files
 calmean          = True       # make mean states
 findout          = True       # pick out the locations of your sites
-draw2d           = True       # 2D plots, SWCF etc.
+draw2d           = False       # 2D plots, SWCF etc.
 drawlarge        = True       # profiles for large-scale variable on your sites 
 drawclubb        = True       # profiles for standard clubb output
 drawskw          = False       # profiles for skewness functions
-drawrain         = True       # profiles for SNOW, Rain etc.
-drawbgt          = True       # budgets of CLUBB prognostic Eqs 
-drawe3smbgt      = True       # budgets of e3sm tendency
+drawrain         = False       # profiles for SNOW, Rain etc.
+drawbgt          = False       # budgets of CLUBB prognostic Eqs 
+drawe3smbgt      = False       # budgets of e3sm tendency
 drawmicrobgt     = False       # budgets of MG2
 drawaero         = False       # AERO for cloud brone
 # ONLY for SILHS
@@ -109,7 +111,7 @@ if calmean:
 
 if findout:
     print('Find out the sites')
-    function_pick_out.pick_out(ncases, cases, years, nsite, lats, lons, area, filepath,casedir)
+    function_pick_out.pick_out(ncases, cases, years, nsite, lats, lons, area, filepath,casedir,calfvsite)
 
 if draw2d:
     print('Drawing 2d')
@@ -119,7 +121,7 @@ if draw2d:
 
 if drawlarge:
     print('Drawing Large-scale variables on selected sites')
-    plotlgs=draw_large_scale.large_scale_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir)
+    plotlgs=draw_large_scale.large_scale_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,calfvsite)
 
 if drawclubb:
     print('Drawing CLUBB standard variables on selected sites')
@@ -128,27 +130,27 @@ if drawclubb:
     varis    = [ 'wp2','up2','vp2','rtp2','thlp2','wp3']
     cscale   = [     1,    1,    1,   1E6,      1,    1]
     chscale  = [   '1',  '1',  '1','1E-6',    '1',  '1']
-    plotstd1=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)
+    plotstd1=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite)
 
     pname = 'std2'
     varis    = [ 'wprtp','wpthlp','wprcp','upwp','vpwp','rtpthlp']
     cscale   = [     1E3,       1,    1E3,     1,     1,     1E3] 
     chscale  = [  '1E-3',     '1', '1E-3',   '1',    '1',    '1E-3']
 
-    plotstd2=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)
+    plotstd2=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite)
 
     pname = 'std3'
     varis    = [ 'wp2thlp','wp2rtp','wpthlp2','wprtp2','rcp2', 'wp2rcp']
     cscale   = [         1,        1,       1,     1E6,   1E6,      1E3] 
     chscale  = [       '1',      '1',     '1',  '1E-6','1E-6',   '1E-3']
 
-    plotstd3=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)
+    plotstd3=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite)
 
     varis    = [ 'wpthvp','wp2thvp','rtpthvp','thlpthvp','wp4','wprtpthlp']
     cscale   = [        1,        1,      1E3,         1,    1,        1E3] 
     chscale  = [      '1',      '1',   '1E-3',       '1',  '1',    '1-E-3']
     pname = 'std4'
-    plotstd4=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)
+    plotstd4=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite)
 
 #    pname = 'Tau'
 #    varis   = [ 'invrs_tau_bkgnd','invrs_tau_shear','invrs_tau_sfc','tau_no_N2_zm','tau_zm','tau_wp2_zm','tau_xp2_zm','tau_wp3_zm',  'bv_freq_sqd']
