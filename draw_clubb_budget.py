@@ -14,7 +14,7 @@ import os
 from subprocess import call
 
  
-def draw_clubb_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname):
+def draw_clubb_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,dofv):
 
 # ncases, the number of models
 # cases, the name of models
@@ -152,6 +152,9 @@ def draw_clubb_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
              ncdf= Dataset(ncdfs[im],'r')
              n   =ncdf.variables['n'][:]
              idx_cols=ncdf.variables['idx_cols'][:,:]
+             if (dofv):
+               idx_lats=ncdf.variables['idx_coord_lat'][:,:]
+               idx_lons=ncdf.variables['idx_coord_lon'][:,:]
              ncdf.close()
              A_field = np.zeros((nterms,nilev),np.float32)
              theunits=str(chscale[iv])+"x"+inptrs.variables[varis[iv]+'_bt'].units
@@ -162,7 +165,13 @@ def draw_clubb_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
                  for subc in range( 0, n[ire]):
                      varis_bgt= varis[iv]+budget_ends[it]
                      npoint=idx_cols[ire,n[subc]-1]-1
-                     tmp=inptrs.variables[varis_bgt][0,:,npoint] #/n[ire]
+                     if(dofv):
+                        npointlat=idx_lats[ire,0]
+                        npointlon=idx_lons[ire,0]
+                     if (dofv):
+                        tmp=inptrs.variables[varis_bgt][0,:,npointlat,npointlon]
+                     else:
+                        tmp=inptrs.variables[varis_bgt][0,:,npoint] #/n[ire]
                      if (varis[iv] == "wprtp" ) :
                          tmp [0:10] = 0.0
 

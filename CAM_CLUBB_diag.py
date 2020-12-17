@@ -44,12 +44,12 @@ casename      =case+'_'+cseason
 calfvsite        = True       # Calculate site indexes for FV files
 calmean          = True       # make mean states
 findout          = True       # pick out the locations of your sites
-draw2d           = False       # 2D plots, SWCF etc.
+draw2d           = True       # 2D plots, SWCF etc.
 drawlarge        = True       # profiles for large-scale variable on your sites 
 drawclubb        = True       # profiles for standard clubb output
-drawskw          = False       # profiles for skewness functions
-drawrain         = False       # profiles for SNOW, Rain etc.
-drawbgt          = False       # budgets of CLUBB prognostic Eqs 
+drawskw          = True       # profiles for skewness functions
+drawrain         = True       # profiles for SNOW, Rain etc.
+drawbgt          = True       # budgets of CLUBB prognostic Eqs 
 drawe3smbgt      = False       # budgets of e3sm tendency
 drawmicrobgt     = False       # budgets of MG2
 drawaero         = False       # AERO for cloud brone
@@ -115,7 +115,7 @@ if findout:
 
 if draw2d:
     print('Drawing 2d')
-    plot2d=draw_plots_hoz_2D.draw_2D_plot(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir)
+    plot2d=draw_plots_hoz_2D.draw_2D_plot(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,calfvsite)
     clevel=500
     plot3d=draw_plots_hoz_3D.draw_3D_plot(ptype,clevel,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir)
 
@@ -177,25 +177,25 @@ if drawrain:
     varis   = [ 'AQRAIN','ANRAIN','ADRAIN','FREQR']
     cscale  = [      1E6,     1,       1E4,      1]
     chscale = [   '1E-6',  '1',    '1E-4',     '1']
-    plotrain=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)
+    plotrain=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite)
 
     pname = 'Snow'
     varis   = [ 'AQSNOW','ANSNOW','ADSNOW','FREQS']
     cscale  = [      1E6,     1,       1E4,      1]
     chscale = [   '1E-6',  '1',    '1E-4',     '1']
-    plotsnow=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)
+    plotsnow=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite)
 
     pname = 'NUM'
     varis   = [ 'AWNC','AWNI','AREL','AREI']
     cscale  = [     1E-7,    1E-3,        1,         1]
     chscale = [    '1E7',   '1E3',      '1',       '1']
-    plotsnum=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)
+    plotsnum=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite)
 
     pname = 'RAINQM'
     varis   = [ 'RAINQM','NUMRAI']
     cscale  = [     1E-12,    1E-3]
     chscale = [    '1E12',   '1E3']
-    plotsqm=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)
+    plotsqm=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite)
 
 
 if drawaero:
@@ -246,19 +246,19 @@ if drawbgt:
     cscale  = [     1,    1,    1,    1]
     chscale = [   '1',  '1',  '1',  '1']
     pname = 'Budget1'
-    plotbgt1=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)
+    plotbgt1=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite)
 
     varis    = [ 'wprtp','wpthlp',  'rtp2', 'thlp2']
     cscale   = [     1E7,     1E4,    1E11,     1E4]
     chscale  = [  '1E-7',  '1E-4', '1E-11',  '1E-4']
     pname = 'Budget2'
-    plotbgt2=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)   
+    plotbgt2=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite)   
 
     varis   = [  'um',   'rtpthlp',  'thlm',   'rtm']
     cscale  = [   1E4,    1E4,     1E5,     1E8]
     chscale = ['1E-4', '1E-4',  '1E-5',  '1E-8']
     pname = 'Budget3'
-    plotbgt3=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname)  
+    plotbgt3=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite)  
 
 if makeweb:
     print('Making webpages')

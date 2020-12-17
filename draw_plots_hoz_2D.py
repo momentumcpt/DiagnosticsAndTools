@@ -15,7 +15,7 @@ import Common_functions
 from subprocess import call
 
 
-def draw_2D_plot (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir):
+def draw_2D_plot (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,dofv):
 
 # ncases, the number of models
 # cases, the name of models
@@ -221,17 +221,28 @@ def draw_2D_plot (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, fi
        ncdf= Dataset(ncdfs[im],'r')
        n   =ncdf.variables['n'][:]
        idx_cols=ncdf.variables['idx_cols'][:]
-       if (varis[iv] == 'PRECT'):
-           A = inptrs.variables['PRECC'][0,:]+inptrs.variables['PRECL'][0,:]
-       elif (varis[iv] == 'FLUT'):
-           A = inptrs.variables['FLUT'][0,:]-inptrs.variables['FLNS'][0,:]
-       elif (varis[iv] == 'U10'):
-           A = inptrs.variables['U10'][0,:]*inptrs.variables['U10'][0,:]
-           A = np.sqrt(A)
+       if (dofv):
+           idx_lats=ncdf.variables['idx_coord_lat'][:,:]
+           idx_lons=ncdf.variables['idx_coord_lon'][:,:]
+           if (varis[iv] == 'PRECT'):
+             A = inptrs.variables['PRECC'][0,:,:]+inptrs.variables['PRECL'][0,:,:]
+           elif (varis[iv] == 'FLUT'):
+             A = inptrs.variables['FLUT'][0,:,:]-inptrs.variables['FLNS'][0,:,:]
+           elif (varis[iv] == 'U10'):
+             A = inptrs.variables['U10'][0,:,:]*inptrs.variables['U10'][0,:,:]
+             A = np.sqrt(A)
+           else:
+             A = inptrs.variables[varis[iv]][0,:,:]
        else:
-           A = inptrs.variables[varis[iv]][0,:]
-
-
+           if (varis[iv] == 'PRECT'):
+             A = inptrs.variables['PRECC'][0,:]+inptrs.variables['PRECL'][0,:]
+           elif (varis[iv] == 'FLUT'):
+             A = inptrs.variables['FLUT'][0,:]-inptrs.variables['FLNS'][0,:]
+           elif (varis[iv] == 'U10'):
+             A = inptrs.variables['U10'][0,:]*inptrs.variables['U10'][0,:]
+             A = np.sqrt(A)
+           else:
+             A = inptrs.variables[varis[iv]][0,:]
 
        A_xy=A
        A_xy = A_xy * cscale[iv]
@@ -267,6 +278,13 @@ def draw_2D_plot (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, fi
 
 
        p = Ngl.contour_map(wks,A_xy,res)
+
+       poly_res               = Ngl.Resources()
+       poly_res.gsMarkerIndex = 16
+       poly_res.gsMarkerSizeF = 0.005
+       poly_res.gsMarkerColor = 'green'
+       dum = Ngl.add_polymarker(wks,p,lons,lats,poly_res)
+
        plot.append(p)
 
 # observation 
@@ -312,12 +330,12 @@ def draw_2D_plot (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, fi
    res.tiMainString   =  'GLB='+str(glb)
 
    p =Ngl.contour_map(wks,B,res)
-   if (iv == 0) :
-      poly_res               = Ngl.Resources()
-      poly_res.gsMarkerIndex = 16
-      poly_res.gsMarkerSizeF = 0.005
-      poly_res.gsMarkerColor = 'green'
-      dum = Ngl.add_polymarker(wks,p,lons,lats,poly_res)
+   #if (iv == 0) :
+   poly_res               = Ngl.Resources()
+   poly_res.gsMarkerIndex = 16
+   poly_res.gsMarkerSizeF = 0.005
+   poly_res.gsMarkerColor = 'green'
+   dum = Ngl.add_polymarker(wks,p,lons,lats,poly_res)
 
    plot.append(p)
 

@@ -14,7 +14,7 @@ import Common_functions
 from subprocess import call
 
 
-def rain_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname):
+def rain_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname, dofv):
 
 # ncases, the number of models
 # cases, the name of models
@@ -117,13 +117,22 @@ def rain_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepa
              ncdf= Dataset(ncdfs[im],'r')
              n   =ncdf.variables['n'][:]
              idx_cols=ncdf.variables['idx_cols'][:,:]
+             if (dofv):
+               idx_lats=ncdf.variables['idx_coord_lat'][:,:]
+               idx_lons=ncdf.variables['idx_coord_lon'][:,:]
              ncdf.close()
              if (im ==0):
                  A_field = np.zeros((ncases,nlev),np.float32)
 
              for subc in range( 0, n[ire]):
                  npoint=idx_cols[ire,n[subc]-1]-1
-                 tmp=inptrs.variables[varis[iv]][0,:,npoint] 
+                 if(dofv):
+                     npointlat=idx_lats[ire,0]
+                     npointlon=idx_lons[ire,0]
+                 if (dofv):
+                     tmp=inptrs.variables[varis[iv]][0,:,npointlat,npointlon]
+                 else:
+                     tmp=inptrs.variables[varis[iv]][0,:,npoint] 
                  theunits=str(chscale[iv])+'x'+inptrs.variables[varis[iv]].units
                  A_field[im,:] = (A_field[im,:]+tmp[:]/n[ire]).astype(np.float32 )
              A_field[im,:] = A_field[im,:] *cscale[iv]
