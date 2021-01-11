@@ -50,9 +50,9 @@ drawclubb        = True       # profiles for standard clubb output
 drawskw          = True       # profiles for skewness functions
 drawrain         = True       # profiles for SNOW, Rain etc.
 drawbgt          = True       # budgets of CLUBB prognostic Eqs 
-drawe3smbgt      = False       # budgets of e3sm tendency
+drawe3smbgt      = False      # budgets of e3sm tendency
 drawmicrobgt     = False       # budgets of MG2
-drawaero         = False       # AERO for cloud brone
+drawaero         = False      # AERO for cloud brone
 # ONLY for SILHS
 drawhf           = False      # Tendency of holl filler 
 drawsilhs        = False      # profiles for silhs variables
@@ -160,7 +160,7 @@ if drawclubb:
 
 if drawskw:
     print('Drawing CLUBB skewness functions on selected sites')
-    plotskw=draw_clubb_skew.clubb_skw_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir)
+    plotskw=draw_clubb_skew.clubb_skw_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,calfvsite)
 
 if drawsilhs:
     print('CLUBB standard variables on selected sites')
@@ -231,14 +231,14 @@ if drawmicrobgt:
     varis   = [ 'MPDLIQ','MPDICE','QRSEDTEN','QSSEDTEN'] # We just need a unit
     cscale  = [      1E9,     1E9,       1E9,       1E9]
     chscale = [   '1E-9',  '1E-9',    '1E-9',    '1E-9']
-    plotmicrobgt1=draw_micro_budget.draw_micro_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname)
+    plotmicrobgt1=draw_micro_budget.draw_micro_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname,calfvsite)
 
     pname = 'micro2'
     vname   = [ 'Vapor','NUMCLDLIQ','NUMCLDICE']
     varis   = [ 'QISEVAP','nnuccco',  'nnuccdo']  # We just need a unit
     cscale  = [      1E9,     1E-3,      1E-1]
     chscale = [   '1E-9',    '1E3',     '1E1']
-    plotmicrobgt2=draw_micro_budget.draw_micro_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname)
+    plotmicrobgt2=draw_micro_budget.draw_micro_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname,calfvsite)
 
 if drawbgt:
     print('Drawing CLUBB BUDGET')
