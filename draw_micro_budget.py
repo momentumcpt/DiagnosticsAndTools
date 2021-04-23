@@ -105,46 +105,47 @@ def draw_micro_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
          for iv in range (0, nvaris):
 
              if (varis[iv] == 'MPDLIQ' ):   # LIQ
-                budget_ends = ['PRCO',  'PRAO', 'MNUCCCO', 'MNUCCTO', 'MSACWIO', 'PSACWSO', 'BERGSO','BERGO']
-              # in fortran    prc*cld, pra*cld,mnuccc*cld,mnucct*cld,msacwi*cld,psacws*cld,bergs*cld, berg
-              #               (-pra-prc-mnuccc-mnucct-msacwi- psacws-bergs)*lcldm-berg
+               budget_ends = ['QCSEDTEN','QCRESO','MNUCCCO','MNUCCTO','BERGO','MELTO','HOMOO','MSACWIO','BERGSO','PRAO','PRACSO','PRCO','PSACWGO','PGSACWO','QMULTGO']
+              # in fortran    
+              # prc*cld,pra*cld,mnuccc*cld,mnucct*cld,msacwi*cld,psacws*cld,bergs*cld,qmultg*cld,psacwg*cld,pgsacw*cld,berg
+              # (-pra-prc-mnuccc-mnucct-msacwi- psacws-bergs-qmultg-psacwg-pgsacw)*lcldm-berg
                 nterms = len (budget_ends)
 
              if (varis[iv] == 'MPDICE' ):    # ICE
-                budget_ends = [ 'PRCIO', 'PRAIO', 'MSACWIO', 'MNUCCCO',  'MNUCCTO','mnudepo',   'BERGO',  'CMEIOUT','mnuccrio']
-# in fortran                   prci*cld,prai*cld,msacwi*cld,mnuccc*cld, mnucct*cld,      berg, vap_dep + ice_sublim + mnuccd 
-#                (mnuccc+mnucct+mnudep+msacwi)*lcldm+(-prci-prai)*icldm+(vap_dep+ice_sublim+mnuccd)+berg+mnuccri*precip_frac  
+                budget_ends = ['QISEDTEN','QIRESO','CMEIOUT','MNUCCCO','MNUCCTO','BERGO','MELTO','HOMOO','MSACWIO','PRCIO','PRAIO','QMULTGO','QMULTRGO']
+                # in fortran   mnuccc,mnucct,mnudep,msacwi,qmultg,prci,prai,qmultrg,mnuccri,ice_sublim,vap_dep,berg,mnuccd
+                # (mnuccc+mnucct+mnudep+msacwi+qmultg)*lcldm+(-prci-prai)*icldm+(qmultrg+mnuccri)*precip_frac+ice_sublim+vap_dep+berg+mnuccd
                 nterms = len (budget_ends)
 
              if (varis[iv] == 'QRSEDTEN' ):  #  RAIN
-                budget_ends = [ 'PRAO', 'PRCO',  'PRACSO',       'EVAPPREC', 'MNUCCRO','mnuccrio' ]
-#                              pra*cld,prc*cld, psacs*prf, -pre*prf(nevapr),mnuccr*prf
-#             (pra+prc)*lcldm+(pre-pracs- mnuccr-mnuccri)*precip_frac   
+                budget_ends = ['PRAO','PRCO','PRACSO','MNUCCRO','QMULTRGO','PRACGO','PGRACSO']
+                # in fortran  pra,prc,-pre,pracs,mnuccr,mnuccri,qmultrg,pracg,pgracs
+                # (pra(i,k)+prc(i,k))*lcldm(i,k))/precip_frac(i,k)/(-pre(i,k)+pracs(i,k)+mnuccr(i,k)+mnuccri(i,k)+qmultrg(i,k)+pracg(i,k)+pgracs(i,k)
                 nterms = len (budget_ends)
 
              if (varis[iv] == 'QSSEDTEN' ):  # SNOW
-                budget_ends = [ 'PRAIO', 'PRCIO', 'PSACWSO', 'PRACSO','EVAPSNOW',  'MNUCCRO', 'BERGSO']
+                budget_ends = ['PRAIO','PRCIO','PSACWSO','PRACSO','EVAPSNOW','MNUCCRO','BERGSO']
 #                              prai*cld,prci*cld,psacws*cld,psacs*prf, -prds*prc, mnuccr*prf,bergs*cld 
 #              (prai+prci)*icldm+(psacws+bergs)*lcldm+(prds+  pracs+mnuccr)*precip_frac
                 nterms = len (budget_ends)
 
-             if (varis[iv] == 'QISEVAP' ):  # Vapor
-                budget_ends = [ 'EVAPPREC','EVAPSNOW','CMEIOUT','mnudepo' ]
+             #if (varis[iv] == 'QISEVAP' ):  # Vapor
+             #   budget_ends = ['EVAPPREC','EVAPSNOW','CMEIOUT','MNUDEPO']
                #          -pre*prf(nevapr),-prds*prc ,vap_dep + ice_sublim + mnuccd
 #            -(pre+prds)*precip_frac-vap_dep-ice_sublim-mnuccd-mnudep*lcldm 
-                nterms = len (budget_ends)
+              #  nterms = len (budget_ends)
 
-             if (varis[iv] == 'nnuccco' ):  # NUM of LIQ
-                budget_ends = [ 'nnuccco', 'nnuccto', 'npsacwso', 'nsubco', 'nprao','nprc1o']
+#             if (varis[iv] == 'NNUCCCO' ):  # NUM of LIQ
+#                budget_ends = ['NNUCCCO','NNUCCTO','NPSACWSO','NSUBCO','NPRAO','NPRC1O']
 #                               nnuccc*cld,nnucct*cld,npsacws*cld,nsubc*cld,npra*cld,nprc1*cld
-#                              (-nnuccc-nnucct-npsacws+nsubc-npra-nprc1)*lcldm
-                nterms = len (budget_ends)
+#                              (-nnuccc-nnucct-npsacws+nsubc-npra-nprc1+npsacwg)*lcldm
+#                nterms = len (budget_ends)
                  
-             if (varis[iv] == 'nnuccdo' ):  # NUM of ICE
-                budget_ends = [  'nnuccdo',  'nnuccto',  'tmpfrzo',  'nnudepo',  'nsacwio',  'nsubio',  'nprcio',  'npraio','nnuccrio','DETNICETND']
+#             if (varis[iv] == 'NNUCCDO' ):  # NUM of ICE
+#                budget_ends = ['NNUCCDO','NNUCCTO','TMPFRZO','NNUDEPO','NSACWIO','NSUBIO','NPRCIO','NPRAIO','NNUCCRIO','DETNICETND']
 #                                nnuccd   ,nnucct*lcld,tmpfrz*lcld,nnudep*lcld,nsacwi*lcld,nsubi*icld,nprci*icld,nprai*icld,nnuccri*prf
 #                                nnuccd+ (nnucct+tmpfrz+nnudep+nsacwi)*lcldm+(nsubi-nprci- nprai)*icldm+nnuccri*precip_frac
-                nterms = len (budget_ends)
+#                nterms = len (budget_ends)
 
 
 
