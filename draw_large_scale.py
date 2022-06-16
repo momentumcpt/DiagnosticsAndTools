@@ -178,22 +178,22 @@ def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons,
                  if(dofv):
                   npointlat=idx_lats[ire,0]
                   npointlon=idx_lons[ire,0]
+                 if (dofv):
+                   ps=inptrs.variables['PS'][0,npointlat,npointlon]
+                 else:
+                   ps=inptrs.variables['PS'][0,npoint]
+                 ps=ps
+                 p0=100000.0  #CAM uses a hard-coded p0
+                 pre = np.zeros((nlev),np.float32)
+                 for il in range (0, nlev):
+                     pre[il] = hyam[il]*p0 + hybm[il] * ps
+                 lev = pre/100
                  if (varis[iv] == 'THETA'):
                      if (dofv):
                        tmp = inptrs.variables['T'][0,:,npointlat,npointlon]
                      else:
-                       tmp = inptrs.variables['T'][0,:,npoint]
-                     hyam =inptrs.variables['hyam'][:]
-                     hybm =inptrs.variables['hybm'][:]
-                     if (dofv):
-                       ps=inptrs.variables['PS'][0,npointlat,npointlon] 
-                     else:
-                       ps=inptrs.variables['PS'][0,npoint] 
-                     ps=ps
-                     p0=100000.0  #CAM uses a hard-coded p0
-                     pre = np.zeros((nlev),np.float32)
+                       tmp = inptrs.variables['T'][0,:,npoint]                  
                      for il in range (0, nlev):
-                         pre[il] = hyam[il]*p0 + hybm[il] * ps
                          tmp[il] = tmp[il] * (100000/pre[il])**0.286
                      theunits=str(cscale[iv])+"x"+inptrs.variables['T'].units
 
@@ -212,6 +212,8 @@ def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons,
          res.tiMainString  =  varis[iv]+"  "+theunits
          res.trXMinF = min(np.min(A_field[0, :]),np.min(B))
          res.trXMaxF = max(np.max(A_field[0, :]),np.max(B))
+         res.trYMinF = np.min(lev)
+         res.trYMaxF = np.max(lev)
          if(varis[iv] == "THETA"):
              res.trXMinF = 270.
              res.trXMaxF = 400.
