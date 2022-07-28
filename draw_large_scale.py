@@ -185,6 +185,8 @@ def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons,
                  ps=ps
                  p0=100000.0  #CAM uses a hard-coded p0
                  pre = np.zeros((nlev),np.float32)
+                 hyam=inptrs.variables['hyam'][:]
+                 hybm=inptrs.variables['hybm'][:]
                  for il in range (0, nlev):
                      pre[il] = hyam[il]*p0 + hybm[il] * ps
                  lev = pre/100
