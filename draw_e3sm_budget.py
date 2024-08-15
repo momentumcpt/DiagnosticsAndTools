@@ -14,7 +14,7 @@ import os
 from subprocess import call
 
  
-def draw_e3sm_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,dpsc):
+def draw_e3sm_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,dpsc,datapath):
 
 # ncases, the number of models
 # cases, the name of models
@@ -139,7 +139,7 @@ def draw_e3sm_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, f
                  nterms = len (budget_ends)
 
 
-             ncdfs[im]  = './data/'+cases[im]+'_site_location.nc'
+             ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
              infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
              inptrs = Dataset(infiles[im],'r')       # pointer to file1
              lat=inptrs.variables['lat'][:]

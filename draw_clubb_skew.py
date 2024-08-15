@@ -15,7 +15,7 @@ import Common_functions
 from subprocess import call
 
 
-def clubb_skw_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir, dofv):
+def clubb_skw_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir, dofv,datapath):
 
 # ncases, the number of models
 # cases, the name of models
@@ -37,7 +37,7 @@ def clubb_skw_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, f
  ncdfs    = ["" for x in range(ncases)]
  nregions = nsite
 
- varis    = [ "C6rt_Skw_fnc","C11_Skw_fnc","C1_Skw_fnc","C7_Skw_fnc","Lscale","Richardson_num","Kh_zm","tau_zm","Skw_velocity"]
+ varis    = [ "C6rt_Skw_fnc","C11_Skw_fnc","C1_Skw_fnc","C7_Skw_fnc","Lscale","Kh_zm","tau_zm","Skw_velocity","Ri_zm"]
  varisobs = ["CC_ISBL", "OMEGA","SHUM","CLWC_ISBL", "THETA","RELHUM","U","CIWC_ISBL","T" ]
  nvaris = len(varis)
  cunits = ["%","mba/day","g/kg","g/kg","K", "%", "m/s", "g/kg", "m/s", "m/s","K","m" ]
@@ -132,7 +132,7 @@ def clubb_skw_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, f
 
 
          for im in range (0,ncases):
-             ncdfs[im]  = './data/'+cases[im]+'_site_location.nc'
+             ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
              infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
              inptrs = Dataset(infiles[im],'r')       # pointer to file1
              lat=inptrs.variables['lat'][:]

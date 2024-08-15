@@ -15,7 +15,7 @@ import Common_functions
 from subprocess import call
 
 
-def clubb_std_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs, casedir,varis,cscale,chscale,pname,dofv):
+def clubb_std_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs, casedir,varis,cscale,chscale,pname,dofv,underlev,datapath):
 
 # ncases, the number of models
 # cases, the name of models
@@ -130,7 +130,7 @@ def clubb_std_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, f
 
 
          for im in range (0,ncases):
-             ncdfs[im]  = './data/'+cases[im]+'_site_location.nc'
+             ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
              infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
              inptrs = Dataset(infiles[im],'r')       # pointer to file1
              lat=inptrs.variables['lat'][:]
@@ -186,8 +186,6 @@ def clubb_std_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, f
                         tmp [0:10] = 0.0
                         theunits=str(chscale[iv])+'x'+inptrs.variables[varis[iv]].units+'^-1'
 
-
-
                  A_field[im,:] = (A_field[im,:]+tmp[:]/n[ire]).astype(np.float32 )
              A_field[im,:] = A_field[im,:] *cscale[iv]
 
@@ -200,6 +198,11 @@ def clubb_std_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, f
          else:
              res.tiMainString    =  varis[iv]+"  "+theunits
 
+         levind = underlev//1000*72
+         res.trXMinF = np.min(A_field[:, levind:])
+         res.trXMaxF = np.max(A_field[:, levind:])
+         res.trYMinF = underlev
+         res.trYMaxF = 1000.
          res.trYReverse        = True
          res.xyLineColors      = np.arange(3,20,2)
          res.xyMarkerColors    = np.arange(2,20,2)
