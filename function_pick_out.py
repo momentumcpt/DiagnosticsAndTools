@@ -18,7 +18,7 @@ def closest_idx(lst, K):
 
     return min(range(len(lst)), key = lambda i: abs(lst[i]-K))
 
-def pick_out(ncases, cases,years, nsite,lats, lons,area, filepath,casedir,fv):
+def pick_out(ncases, cases,years, nsite,lats, lons,area, filepath,casedir,fv,datapath):
 # ncases, the number of models
 # cases, the name of models
 # casename, the name of cases
@@ -28,13 +28,13 @@ def pick_out(ncases, cases,years, nsite,lats, lons,area, filepath,casedir,fv):
  print(ncases)
 # inptrs = [ncases]
 
- if not os.path.exists("data"):
-        os.mkdir("data")
+ if not os.path.exists(datapath):
+        os.mkdir(datapath)
 
 
  for im in range(0,ncases):
     
-     infile=filepath[im]+cases[im]+'.cam.h0.'+str(years[im]).rjust(4,'0')+'-01.nc'
+     infile=filepath[im]+cases[im]+'.cam.h0a.'+str(years[im]).rjust(4,'0')+'-01.nc'
 
      print(infile)
      print(im)
@@ -56,8 +56,8 @@ def pick_out(ncases, cases,years, nsite,lats, lons,area, filepath,casedir,fv):
      os.system('cp -f '+ txtfile2+ ' '+ casedir+'/txt/')
 
 
-     os.system('rm -f ./data/'+cases[im]+'_site_location.nc')
-     outf =Dataset('./data/'+cases[im]+'_site_location.nc','w')
+     os.system('rm -f '+datapath+cases[im]+'_site_location.nc')
+     outf =Dataset(datapath+cases[im]+'_site_location.nc','w')
      outf.createDimension("sit",nsite)
      outf.createDimension("col",5)
      outf.createDimension("coord",1)

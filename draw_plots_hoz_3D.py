@@ -15,7 +15,7 @@ import Common_functions
 from subprocess import call
 
 
-def draw_3D_plot (ptype,clevel,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir):
+def draw_3D_plot (ptype,clevel,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir, datapath):
 
 # ncases, the number of models
 # cases, the name of models
@@ -206,7 +206,7 @@ def draw_3D_plot (ptype,clevel,cseason, ncases, cases, casenames, nsite, lats, l
 
 
    for im in range(0, ncases):
-       ncdfs[im]  = './data/'+cases[im]+'_site_location.nc' 
+       ncdfs[im]  = datapath+cases[im]+'_site_location.nc' 
        infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
        inptrs = Dataset(infiles[im],'r')       # pointer to file1
        lat=inptrs.variables['lat'][:]
