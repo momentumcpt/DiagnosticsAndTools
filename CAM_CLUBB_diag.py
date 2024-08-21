@@ -12,7 +12,7 @@ Main code to make 1) 2D plots,2) profiles, 3) budgets on selected stations,
 # User defined name used for this comparison, this will be the name 
 #   given the directory for these diagnostics
 case='inst_test_a1_inst'
-outdir="/glade/work/stepheba/post/DiagnosticsAndToolsInst/diags_output/"
+outdir="/glade/work/stepheba/post/DiagnosticsAndTools/diags_output/"
 
 filepath=['/glade/derecho/scratch/stepheba/archive/cam144_lscale_pmf_a1test/atm/hist/']
 
@@ -28,13 +28,13 @@ nyear=[1]
 
 #only need this for instantaneous --- replace with "inst_time_string=None" if not instantaneous
 #the first slot gives the filename timestamp to look for, second slot gives timestep within file (starting at 0)
-inst_time_string=['.cam.h0i.1979-01-01-01800.nc',10]
+inst_time_string=None #['.cam.h0i.1979-01-01-01800.nc',10]
 
 
 dpsc=['zm']
 # NOTE, dpsc,deep scheme, has to be 'none', if silhs is turned on. 
 
-datapath="/glade/work/stepheba/post/DiagnosticsAndToolsInst/data/"
+datapath="/glade/work/stepheba/post/DiagnosticsAndTools/data/"
 
 # Observation Data
 #filepathobs='/global/project/projectdirs/m2689/zhun/amwg/obs_data_20140804/'
