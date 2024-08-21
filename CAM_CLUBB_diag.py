@@ -48,7 +48,7 @@ casename      =case+'_'+cseason
 
 #------------------------------------------------------------------------
 calfvsite        = True       # Calculate site indexes for FV files
-calmean          = False       # make mean states
+calmean          = True       # make mean states
 findout          = True       # pick out the locations of your sites
 draw2d           = True       # 2D plots, SWCF etc.
 drawlarge        = True       # profiles for large-scale variable on your sites 
