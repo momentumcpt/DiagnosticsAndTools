@@ -14,7 +14,7 @@ import Common_functions
 from subprocess import call
 
 
-def rain_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname, dofv,datapath):
+def rain_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname, dofv,datapath,inst_time_string):
 
 # ncases, the number of models
 # cases, the name of models
@@ -106,7 +106,12 @@ def rain_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepa
 
          for im in range (0,ncases):
              ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
-             infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+             if inst_time_string==None:
+                 infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+                 timestep=0
+             else:
+                 infiles[im]= filepath[im]+'/'+cases[im]+inst_time_string[0]
+                 timestep = inst_time_string[1]
              inptrs = Dataset(infiles[im],'r')       # pointer to file1
              lat=inptrs.variables['lat'][:]
              nlat=len(lat)
@@ -130,9 +135,9 @@ def rain_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepa
                      npointlat=idx_lats[ire,0]
                      npointlon=idx_lons[ire,0]
                  if (dofv):
-                     tmp=inptrs.variables[varis[iv]][0,:,npointlat,npointlon]
+                     tmp=inptrs.variables[varis[iv]][timestep,:,npointlat,npointlon]
                  else:
-                     tmp=inptrs.variables[varis[iv]][0,:,npoint] 
+                     tmp=inptrs.variables[varis[iv]][timestep,:,npoint] 
                  theunits=str(chscale[iv])+'x'+inptrs.variables[varis[iv]].units
                  A_field[im,:] = (A_field[im,:]+tmp[:]/n[ire]).astype(np.float32 )
              A_field[im,:] = A_field[im,:] *cscale[iv]

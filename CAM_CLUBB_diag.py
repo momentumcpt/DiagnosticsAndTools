@@ -11,12 +11,12 @@ Main code to make 1) 2D plots,2) profiles, 3) budgets on selected stations,
 # Begin User Defined Settings
 # User defined name used for this comparison, this will be the name 
 #   given the directory for these diagnostics
-case='taus_144_zhun'
-outdir="/glade/work/stepheba/post/DiagnosticsAndTools/diags_output/"
+case='inst_test_a1_inst'
+outdir="/glade/work/stepheba/post/DiagnosticsAndToolsInst/diags_output/"
 
-filepath=['/glade/derecho/scratch/stepheba/archive/taus_144_zhun/atm/hist/']
+filepath=['/glade/derecho/scratch/stepheba/archive/cam144_lscale_pmf_a1test/atm/hist/']
 
-cases=['taus_144_zhun']
+cases=['cam144_lscale_pmf_a1test']
        
 # Give a short name for your experiment which will appears on plots
 
@@ -24,12 +24,17 @@ cases=['taus_144_zhun']
 casenames=cases #["037_f2c","044_f2c","044_f2c_sfc0.2","044_f2c_gammashear"]
 
 years=[1979]
-nyear=[2]
+nyear=[1]
+
+#only need this for instantaneous --- replace with "inst_time_string=None" if not instantaneous
+#the first slot gives the filename timestamp to look for, second slot gives timestep within file (starting at 0)
+inst_time_string=['.cam.h0i.1979-01-01-01800.nc',10]
+
 
 dpsc=['zm']
 # NOTE, dpsc,deep scheme, has to be 'none', if silhs is turned on. 
 
-datapath="/glade/work/stepheba/post/DiagnosticsAndTools/data/"
+datapath="/glade/work/stepheba/post/DiagnosticsAndToolsInst/data/"
 
 # Observation Data
 #filepathobs='/global/project/projectdirs/m2689/zhun/amwg/obs_data_20140804/'
@@ -43,7 +48,7 @@ casename      =case+'_'+cseason
 
 #------------------------------------------------------------------------
 calfvsite        = True       # Calculate site indexes for FV files
-calmean          = True       # make mean states
+calmean          = False       # make mean states
 findout          = True       # pick out the locations of your sites
 draw2d           = True       # 2D plots, SWCF etc.
 drawlarge        = True       # profiles for large-scale variable on your sites 
@@ -61,6 +66,13 @@ drawsilhs        = False      # profiles for silhs variables
 
 makeweb          =True        # Make a webpage?
 maketar          =True        # Tar them?
+
+
+# set calmean=F and turn off time series if inst_time_string is defined, otherwise continue on
+if inst_time_string is not None:
+    calmean=False
+    drawts=False
+
 
 clevel = 500
 area  = 1.
@@ -120,19 +132,19 @@ if findout:
 
 if draw2d:
     print('Drawing 2d')
-    plot2d=draw_plots_hoz_2D.draw_2D_plot(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,calfvsite,datapath)
+    plot2d=draw_plots_hoz_2D.draw_2D_plot(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,calfvsite,datapath,inst_time_string)
     clevel=500
-    plot3d=draw_plots_hoz_3D.draw_3D_plot(ptype,clevel,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,datapath)
+    plot3d=draw_plots_hoz_3D.draw_3D_plot(ptype,clevel,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,datapath,inst_time_string)
 
 if drawlarge:
     print('Drawing Large-scale variables on selected sites')
     pname = "Largescale"
     underlev = 0
-    plotlgs=draw_large_scale.large_scale_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,calfvsite,datapath,pname, underlev)
+    plotlgs=draw_large_scale.large_scale_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,calfvsite,datapath,inst_time_string,pname, underlev)
 
     pname = "Largescale_lev"
     underlev = 750
-    plotlgs_lev=draw_large_scale.large_scale_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,calfvsite,datapath,pname, underlev)
+    plotlgs_lev=draw_large_scale.large_scale_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,calfvsite,datapath,inst_time_string,pname, underlev)
 
 if drawclubb:
     print('Drawing CLUBB standard variables on selected sites')
@@ -142,59 +154,59 @@ if drawclubb:
     cscale   = [     1,    1,    1,   1E6,      1,    1]
     chscale  = [   '1',  '1',  '1','1E-6',    '1',  '1']
     underlev = 0
-    plotstd1=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath)
+    plotstd1=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath,inst_time_string)
 
     underlev = 750
     pname = 'std1_lev'
-    plotstd1_lev=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath)
+    plotstd1_lev=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath,inst_time_string)
 
     pname = 'std2'
     varis    = [ 'wprtp','wpthlp','wprcp','upwp','vpwp','rtpthlp']
     cscale   = [     1E3,       1,    1E3,     1,     1,     1E3] 
     chscale  = [  '1E-3',     '1', '1E-3',   '1',    '1',    '1E-3']
     underlev = 0
-    plotstd2=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath)
+    plotstd2=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath,inst_time_string)
 
     underlev = 750
     pname = 'std2_lev'
-    plotstd2_lev=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath)
+    plotstd2_lev=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath,inst_time_string)
 
     pname = 'std3'
     varis    = [ 'wp2thlp','wp2rtp','wpthlp2','wprtp2','rcp2', 'wp2rcp']
     cscale   = [         1,        1,       1,     1E6,   1E6,      1E3] 
     chscale  = [       '1',      '1',     '1',  '1E-6','1E-6',   '1E-3']
     underlev = 0
-    plotstd3=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath)
+    plotstd3=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath,inst_time_string)
 
     underlev = 750
     pname = 'std3_lev'
-    plotstd3_lev=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath)
+    plotstd3_lev=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath,inst_time_string)
 
     varis    = [ 'wpthvp','wp2thvp','rtpthvp','thlpthvp','wp4','wprtpthlp']
     cscale   = [        1,        1,      1E3,         1,    1,        1E3] 
     chscale  = [      '1',      '1',   '1E-3',       '1',  '1',    '1-E-3']
     pname = 'std4'
     underlev = 0
-    plotstd4=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath)
+    plotstd4=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath,inst_time_string)
 
     underlev = 750
     pname = 'std4_lev'
-    plotstd4_lev=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath)
+    plotstd4_lev=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath,inst_time_string)
 
     pname = 'Tau'
     varis   = [ 'invrs_tau_bkgnd','invrs_tau_shear','invrs_tau_sfc','invrs_tau_no_N2_zm','invrs_tau_zm','invrs_tau_wp2_zm','invrs_tau_xp2_zm','invrs_tau_wp3_zm','bv_freq_sqd']
     cscale  = [               1E3,              1E3,            1E3,           1E3,     1E3,         1E3,         1E3,         1E3,            1E3]
     chscale = [            '1E-3',           '1E-3',         '1E-3',        '1E-3',  '1E-3',      '1E-3',      '1E-3',      '1E-3',         '1E-3']
     underlev=0
-    plottau=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath)
+    plottau=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath,inst_time_string)
 
     underlev = 750
     pname = 'Tau_lev'
-    plottau_lev=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath)
+    plottau_lev=draw_clubb_standard.clubb_std_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,underlev,datapath,inst_time_string)
 
 if drawskw:
     print('Drawing CLUBB skewness functions on selected sites')
-    plotskw=draw_clubb_skew.clubb_skw_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,calfvsite,datapath)
+    plotskw=draw_clubb_skew.clubb_skw_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,calfvsite,datapath,inst_time_string)
 
 if drawts:
     print('Drawing time series on selected sites')
@@ -209,11 +221,11 @@ if drawts:
 
 if drawsilhs:
     print('CLUBB standard variables on selected sites')
-    plotsilhs=draw_silhs_standard.silhs_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir)
+    plotsilhs=draw_silhs_standard.silhs_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir, datapath,inst_time_string)
 
 if drawhf:
     print('Holl filler')
-    plothf=draw_hollfiller.hollfiller_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,datapath)
+    plothf=draw_hollfiller.hollfiller_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,datapath,inst_time_string)
 
 if drawrain:
     print('Drawing Rain and Snow properties')
@@ -222,25 +234,25 @@ if drawrain:
     varis   = [ 'AQRAIN','ANRAIN','ADRAIN','FREQR']
     cscale  = [      1E6,     1,       1E4,      1]
     chscale = [   '1E-6',  '1',    '1E-4',     '1']
-    plotrain=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath)
+    plotrain=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,inst_time_string)
 
     pname = 'Snow'
     varis   = [ 'AQSNOW','ANSNOW','ADSNOW','FREQS']
     cscale  = [      1E6,     1,       1E4,      1]
     chscale = [   '1E-6',  '1',    '1E-4',     '1']
-    plotsnow=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath)
+    plotsnow=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,inst_time_string)
 
     pname = 'NUM'
     varis   = [ 'AWNC','AWNI','AREL','AREI']
     cscale  = [     1E-7,    1E-3,        1,         1]
     chscale = [    '1E7',   '1E3',      '1',       '1']
-    plotsnum=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath)
+    plotsnum=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,inst_time_string)
 
     pname = 'RAINQM'
     varis   = [ 'RAINQM','NUMRAI']
     cscale  = [     1E-12,    1E-3]
     chscale = [    '1E12',   '1E3']
-    plotsqm=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath)
+    plotsqm=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,inst_time_string)
 
 
 if drawaero:
@@ -250,24 +262,24 @@ if drawaero:
     varis   = [ 'DSTFREZIMM','BCFREZIMM','DSTFREZCNT','BCFREZCNT','DSTFREZDEP','BCFREZDEP']
     cscale  = [            1,          1,        1E12,       1E3 ,         1E8,        1E3]
     chscale = [          '1',        '1',     '1E-12',     '1E-3',      '1E-8',     '1E-3']
-    plotsaero1=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,datapath)
+    plotsaero1=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,datapath,inst_time_string)
 
     pname = 'FREQAERO'
     varis   = ['FREQIMM','FREQCNT','FREQDEP','FREQMIX']
     cscale  = [      1,     1,       1E3,      1]
     chscale = [    '1',   '1',    '1E-3',     '1']
-    plotsaero2=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,datapath)
+    plotsaero2=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,datapath,inst_time_string)
 
     pname = 'ACN'
     varis   = [ 'bc_a1_num','bc_c1_num','dst_a1_num','dst_a3_num','dst_c1_num','dst_c3_num']
     cscale  = [            1,         1,           1,         1E3,          1,        1E3]
     chscale = [          '1',       '1',         '1',      '1E-3',         '1',     '1E-3']
-    plotsaero3=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,datapath)
+    plotsaero3=draw_rain.rain_prf(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,datapath,inst_time_string)
 
 
 if drawe3smbgt:
     print('Drawing e3sm standard budgets')
-    plote3smbgt=draw_e3sm_budget.draw_e3sm_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,dpsc,datapath)
+    plote3smbgt=draw_e3sm_budget.draw_e3sm_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,dpsc,datapath,inst_time_string)
 
 if drawmicrobgt:
     print('Drawing MG budget')
@@ -276,14 +288,14 @@ if drawmicrobgt:
     varis   = [ 'MPDLIQ','MPDICE','QRSEDTEN','QSSEDTEN'] # We just need a unit
     cscale  = [      1E9,     1E9,       1E9,       1E9]
     chscale = [   '1E-9',  '1E-9',    '1E-9',    '1E-9']
-    plotmicrobgt1=draw_micro_budget.draw_micro_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname,calfvsite,datapath)
+    plotmicrobgt1=draw_micro_budget.draw_micro_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname,calfvsite,datapath,inst_time_string)
 
     pname = 'micro2'
     vname   = [ 'Vapor','NUMCLDLIQ','NUMCLDICE']
     varis   = [ 'QISEVAP','nnuccco',  'nnuccdo']  # We just need a unit
     cscale  = [      1E9,     1E-3,      1E-1]
     chscale = [   '1E-9',    '1E3',     '1E1']
-    plotmicrobgt2=draw_micro_budget.draw_micro_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname,calfvsite,datapath)
+    plotmicrobgt2=draw_micro_budget.draw_micro_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname,calfvsite,datapath,inst_time_string)
 
 if drawbgt:
     print('Drawing CLUBB BUDGET')
@@ -292,50 +304,50 @@ if drawbgt:
     chscale = [   '1',  '1',  '1',  '1', '1', '1']
     pname = 'Budget1'
     underlev = 0
-    plotbgt1=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,underlev)
+    plotbgt1=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,inst_time_string,underlev)
 
     varis    = [ 'wprtp','wpthlp',  'rtp2', 'thlp2']
     cscale   = [     1E7,     1E4,    1E11,     1E4]
     chscale  = [  '1E-7',  '1E-4', '1E-11',  '1E-4']
     pname = 'Budget2'
-    plotbgt2=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,underlev)   
+    plotbgt2=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,inst_time_string,underlev)   
 
     varis   = [  'um',   'rtpthlp',  'thlm',   'rtm']
     cscale  = [   1E4,    1E4,     1E5,     1E8]
     chscale = ['1E-4', '1E-4',  '1E-5',  '1E-8']
     pname = 'Budget3'
-    plotbgt3=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,underlev)  
+    plotbgt3=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,inst_time_string,underlev)  
 
     varis   = ['upwp','vpwp']
     cscale  = [1,1]
     chscale = ['1', '1']
     pname = 'Budget4'
-    plotbgt4=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,underlev)
+    plotbgt4=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,inst_time_string,underlev)
 
     varis   = [ 'wp2','wp3','up2','vp2','upwp','vpwp']
     cscale  = [     1,    1,    1,    1,1,1]
     chscale = [   '1',  '1',  '1',  '1', '1', '1']
     pname = 'Budget1_lev'
     underlev = 750
-    plotbgt1_lev=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,underlev)
+    plotbgt1_lev=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,inst_time_string,underlev)
 
     varis    = [ 'wprtp','wpthlp',  'rtp2', 'thlp2']
     cscale   = [     1E7,     1E4,    1E11,     1E4]
     chscale  = [  '1E-7',  '1E-4', '1E-11',  '1E-4']
     pname = 'Budget2_lev'
-    plotbgt2_lev=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,underlev)
+    plotbgt2_lev=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,inst_time_string,underlev)
 
     varis   = [  'um',   'rtpthlp',  'thlm',   'rtm']
     cscale  = [   1E4,    1E4,     1E5,     1E8]
     chscale = ['1E-4', '1E-4',  '1E-5',  '1E-8']
     pname = 'Budget3_lev'
-    plotbgt3_lev=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,underlev)
+    plotbgt3_lev=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,inst_time_string,underlev)
 
     varis   = ['upwp','vpwp']
     cscale  = [1,1]
     chscale = ['1', '1']
     pname = 'Budget4_lev'
-    plotbgt4_lev=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,underlev)
+    plotbgt4_lev=draw_clubb_budget.draw_clubb_bgt(ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,calfvsite,datapath,inst_time_string,underlev)
 
 if makeweb:
     print('Making webpages')

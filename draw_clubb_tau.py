@@ -16,7 +16,7 @@ import Common_functions
 
 
  
-def draw_clubb_tau (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname,datapath):
+def draw_clubb_tau (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname,datapath,inst_time_string):
 
 # ncases, the number of models
 # cases, the name of models
@@ -143,7 +143,12 @@ def draw_clubb_tau (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
 
 
              ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
-             infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+             if inst_time_string==None:
+                 infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+                 timestep=0
+             else:
+                 infiles[im]= filepath[im]+'/'+cases[im]+inst_time_string[0]
+                 timestep = inst_time_string[1]
              inptrs = Dataset(infiles[im],'r')       # pointer to file1
              lat=inptrs.variables['lat'][:]
              nlat=len(lat)
@@ -179,78 +184,78 @@ def draw_clubb_tau (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
 
                          if ( varis_tau == 'bkgnd' or varis_tau == 'shear' \
                             or varis_tau == 'sfc' ):
-                            tmp=inptrs.variables['invrs_tau_'+varis_tau][0,:,npoint]
+                            tmp=inptrs.variables['invrs_tau_'+varis_tau][timestep,:,npoint]
 
                          if ( varis_tau == 'tau_no_N2_zm' ): 
-                            tmp=inptrs.variables[varis_tau][0,:,npoint]
+                            tmp=inptrs.variables[varis_tau][timestep,:,npoint]
                             tmp=1/tmp
    
                          if (varis[iv] == 'tau_wp2_zm' ):
                             if ( varis_tau == 'tau_wp2_zm' ):
-                               tmp=inptrs.variables[varis_tau][0,:,npoint]
+                               tmp=inptrs.variables[varis_tau][timestep,:,npoint]
                                tmp=1/ tmp
                             if ( varis_tau == 'bvpos' ):
-                               tmp0=inptrs.variables['tau_wp2_zm'][0,:,npoint]
-                               tmp1=inptrs.variables['tau_no_N2_zm'][0,:,npoint]
+                               tmp0=inptrs.variables['tau_wp2_zm'][timestep,:,npoint]
+                               tmp1=inptrs.variables['tau_no_N2_zm'][timestep,:,npoint]
                                tmp=tmp0
                                tmp=1/tmp0-1/tmp1
 
                          if (varis[iv] == 'tau_zm' ):
                             if ( varis_tau == 'tau_zm' ):
-                               tmp=inptrs.variables[varis_tau][0,:,npoint]
+                               tmp=inptrs.variables[varis_tau][timestep,:,npoint]
                                tmp=1/ tmp
                             if ( varis_tau == 'bvpos' ):
-                               tmp0=inptrs.variables['tau_zm'][0,:,npoint]
-                               tmp1=inptrs.variables['tau_no_N2_zm'][0,:,npoint]
+                               tmp0=inptrs.variables['tau_zm'][timestep,:,npoint]
+                               tmp1=inptrs.variables['tau_no_N2_zm'][timestep,:,npoint]
                                tmp=tmp0
                                tmp=1/tmp0-1/tmp1
 
                          if (varis[iv] == 'tau_xp2_zm' ): 
                             if ( varis_tau == 'tau_xp2_zm' ):
-                               tmp=inptrs.variables[varis_tau][0,:,npoint]
+                               tmp=inptrs.variables[varis_tau][timestep,:,npoint]
                                tmp=1/ tmp
                             if ( varis_tau == 'Rich' ):
-                               tmp0=inptrs.variables['tau_xp2_zm'][0,:,npoint]
-                               tmp1=inptrs.variables['tau_no_N2_zm'][0,:,npoint]
+                               tmp0=inptrs.variables['tau_xp2_zm'][timestep,:,npoint]
+                               tmp1=inptrs.variables['tau_no_N2_zm'][timestep,:,npoint]
                                tmp=tmp0
                                tmp=1/tmp0/(1/tmp1)/1000
 
                          if (varis[iv] == 'tau_wp3_zm' ): 
                             if ( varis_tau == 'tau_wp3_zm' or varis_tau == 'tau_wpxp_zm'):
-                               tmp=inptrs.variables[varis_tau][0,:,npoint]
+                               tmp=inptrs.variables[varis_tau][timestep,:,npoint]
                                tmp=1/ tmp
                                tmp[0:10]=0
                             if ( varis_tau == 'bvpos' ):
-                               tmp0=inptrs.variables['tau_wp2_zm'][0,:,npoint]
-                               tmp1=inptrs.variables['tau_no_N2_zm'][0,:,npoint]
+                               tmp0=inptrs.variables['tau_wp2_zm'][timestep,:,npoint]
+                               tmp1=inptrs.variables['tau_no_N2_zm'][timestep,:,npoint]
                                tmp=tmp0
                                tmp=1/tmp0-1/tmp1
                             if ( varis_tau == 'clear' ):
-                               tmp0=inptrs.variables['tau_wp3_zm'][0,:,npoint]
-                               tmp1=inptrs.variables['tau_wp2_zm'][0,:,npoint]
+                               tmp0=inptrs.variables['tau_wp3_zm'][timestep,:,npoint]
+                               tmp1=inptrs.variables['tau_wp2_zm'][timestep,:,npoint]
                                tmp=tmp0
                                tmp=1/tmp0-1/tmp1
                                tmp[0:10]=0
 
                          if (varis[iv] == 'tau_wpxp_zm' ):
                             if ( varis_tau == 'tau_wpxp_zm' or varis_tau == 'tau_zm'):
-                               tmp=inptrs.variables[varis_tau][0,:,npoint]
+                               tmp=inptrs.variables[varis_tau][timestep,:,npoint]
                                tmp=1/ tmp
                             if ( varis_tau == 'bvpos' ):
-                               tmp0=inptrs.variables['tau_zm'][0,:,npoint]
-                               tmp1=inptrs.variables['tau_no_N2_zm'][0,:,npoint]
+                               tmp0=inptrs.variables['tau_zm'][timestep,:,npoint]
+                               tmp1=inptrs.variables['tau_no_N2_zm'][timestep,:,npoint]
                                tmp=tmp0
                                tmp=2/tmp0-1/tmp1
                             if ( varis_tau == 'clear' ):
-                               tmp0=inptrs.variables['tau_wpxp_zm'][0,:,npoint]
-                               tmp1=inptrs.variables['tau_zm'][0,:,npoint]
+                               tmp0=inptrs.variables['tau_wpxp_zm'][timestep,:,npoint]
+                               tmp1=inptrs.variables['tau_zm'][timestep,:,npoint]
                                tmp=tmp0
                                tmp=1/tmp0/5-2/tmp1
 
                      else: 
                          varis_tau=varis[iv]+budget_ends[it]
-                         tmp0=inptrs.variables[varis[iv]][0,:,npoint]
-                         tmp=inptrs.variables[varis_tau][0,:,npoint] 
+                         tmp0=inptrs.variables[varis[iv]][timestep,:,npoint]
+                         tmp=inptrs.variables[varis_tau][timestep,:,npoint] 
 
                      tmp=tmp*cscale[iv]
                      A_field[it,:] = (A_field[it,:]+tmp[:]/n[ire]).astype(np.float32 )

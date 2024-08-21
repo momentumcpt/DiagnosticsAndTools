@@ -14,7 +14,7 @@ import os
 from subprocess import call
 
  
-def draw_clubb_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,dofv,datapath, underlev):
+def draw_clubb_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,cscale,chscale,pname,dofv,datapath,inst_time_string, underlev):
 
 # ncases, the number of models
 # cases, the name of models
@@ -199,7 +199,12 @@ def draw_clubb_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
 
 
              ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
-             infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+             if inst_time_string == None:
+                 infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+                 timestep=0
+             else:
+                 infiles[im]= filepath[im]+'/'+cases[im]+inst_time_string[0]
+                 timestep = inst_time_string[1]
              inptrs = Dataset(infiles[im],'r')       # pointer to file1
              lat=inptrs.variables['lat'][:]
              nlat=len(lat)
@@ -227,9 +232,9 @@ def draw_clubb_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
                         npointlat=idx_lats[ire,0]
                         npointlon=idx_lons[ire,0]
                      if (dofv):
-                        tmp=inptrs.variables[varis_bgt][0,:,npointlat,npointlon]
+                        tmp=inptrs.variables[varis_bgt][timestep,:,npointlat,npointlon]
                      else:
-                        tmp=inptrs.variables[varis_bgt][0,:,npoint] #/n[ire]
+                        tmp=inptrs.variables[varis_bgt][timestep,:,npoint] #/n[ire]
                      if (varis[iv] == "wprtp" ) :
                          tmp [0:10] = 0.0
 

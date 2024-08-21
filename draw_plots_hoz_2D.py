@@ -15,7 +15,7 @@ import Common_functions
 from subprocess import call
 
 
-def draw_2D_plot (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,dofv, datapath):
+def draw_2D_plot (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,dofv, datapath,inst_time_string):
 
 # ncases, the number of models
 # cases, the name of models
@@ -205,8 +205,13 @@ def draw_2D_plot (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, fi
    res.cnLevels      = cntrs[iv][:]
 
    for im in range(0, ncases):
-       ncdfs[im]  = datapath+cases[im]+'_site_location.nc' 
-       infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+       ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
+       if inst_time_string==None:
+           infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+           timestep=0
+       else:
+           infiles[im]= filepath[im]+'/'+cases[im]+inst_time_string[0]
+           timestep = inst_time_string[1]
        inptrs = Dataset(infiles[im],'r')       # pointer to file1
        lat=inptrs.variables['lat'][:]
        nlat=len(lat)
@@ -225,24 +230,24 @@ def draw_2D_plot (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, fi
            idx_lats=ncdf.variables['idx_coord_lat'][:,:]
            idx_lons=ncdf.variables['idx_coord_lon'][:,:]
            if (varis[iv] == 'PRECT'):
-             A = inptrs.variables['PRECC'][0,:,:]+inptrs.variables['PRECL'][0,:,:]
+             A = inptrs.variables['PRECC'][timestep,:,:]+inptrs.variables['PRECL'][timestep,:,:]
            elif (varis[iv] == 'FLUT'):
-             A = inptrs.variables['FLUT'][0,:,:]-inptrs.variables['FLNS'][0,:,:]
+             A = inptrs.variables['FLUT'][timestep,:,:]-inptrs.variables['FLNS'][timestep,:,:]
            elif (varis[iv] == 'U10'):
-             A = inptrs.variables['U10'][0,:,:]*inptrs.variables['U10'][0,:,:]
+             A = inptrs.variables['U10'][timestep,:,:]*inptrs.variables['U10'][timestep,:,:]
              A = np.sqrt(A)
            else:
-             A = inptrs.variables[varis[iv]][0,:,:]
+             A = inptrs.variables[varis[iv]][timestep,:,:]
        else:
            if (varis[iv] == 'PRECT'):
-             A = inptrs.variables['PRECC'][0,:]+inptrs.variables['PRECL'][0,:]
+             A = inptrs.variables['PRECC'][timestep,:]+inptrs.variables['PRECL'][timestep,:]
            elif (varis[iv] == 'FLUT'):
-             A = inptrs.variables['FLUT'][0,:]-inptrs.variables['FLNS'][0,:]
+             A = inptrs.variables['FLUT'][timestep,:]-inptrs.variables['FLNS'][timestep,:]
            elif (varis[iv] == 'U10'):
-             A = inptrs.variables['U10'][0,:]*inptrs.variables['U10'][0,:]
+             A = inptrs.variables['U10'][timestep,:]*inptrs.variables['U10'][timestep,:]
              A = np.sqrt(A)
            else:
-             A = inptrs.variables[varis[iv]][0,:]
+             A = inptrs.variables[varis[iv]][timestep,:]
 
        A_xy=A
        A_xy = A_xy * cscale[iv]

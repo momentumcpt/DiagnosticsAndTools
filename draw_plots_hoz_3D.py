@@ -15,7 +15,7 @@ import Common_functions
 from subprocess import call
 
 
-def draw_3D_plot (ptype,clevel,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir, datapath):
+def draw_3D_plot (ptype,clevel,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir, datapath, inst_time_string):
 
 # ncases, the number of models
 # cases, the name of models
@@ -206,8 +206,13 @@ def draw_3D_plot (ptype,clevel,cseason, ncases, cases, casenames, nsite, lats, l
 
 
    for im in range(0, ncases):
-       ncdfs[im]  = datapath+cases[im]+'_site_location.nc' 
-       infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+       ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
+       if inst_time_string == None:
+           infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+           timestep = 0
+       else:
+           infiles[im]= filepath[im]+'/'+cases[im]+inst_time_string[0]
+           timestep = inst_time_string[1] 
        inptrs = Dataset(infiles[im],'r')       # pointer to file1
        lat=inptrs.variables['lat'][:]
        nlat=len(lat)
@@ -224,7 +229,7 @@ def draw_3D_plot (ptype,clevel,cseason, ncases, cases, casenames, nsite, lats, l
        ncdf= Dataset(ncdfs[im],'r')
        n   =ncdf.variables['n'][:]
        idx_cols=ncdf.variables['idx_cols'][:]
-       A = inptrs.variables[varis[iv]][0,lev_idx,:]
+       A = inptrs.variables[varis[iv]][timestep,lev_idx,:]
        A_xy=A
        A_xy = A_xy * cscale[iv]
        ncdf.close()

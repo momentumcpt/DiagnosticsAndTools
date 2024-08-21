@@ -14,7 +14,7 @@ import os
 from subprocess import call
 
  
-def draw_e3sm_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,dpsc,datapath):
+def draw_e3sm_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,dpsc,datapath,inst_time_string):
 
 # ncases, the number of models
 # cases, the name of models
@@ -140,7 +140,12 @@ def draw_e3sm_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, f
 
 
              ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
-             infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+             if inst_time_string==None:
+                 infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+                 timestep=0
+             else:
+                 infiles[im]= filepath[im]+'/'+cases[im]+inst_time_string[0]
+                 timestep = inst_time_string[1]
              inptrs = Dataset(infiles[im],'r')       # pointer to file1
              lat=inptrs.variables['lat'][:]
              nlat=len(lat)
@@ -161,7 +166,7 @@ def draw_e3sm_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, f
                  for subc in range( 0, n[ire]):
                      varis_bgt= budget_ends[it]
                      npoint=idx_cols[ire,n[subc]-1]-1
-                     tmp=inptrs.variables[varis_bgt][0,:,npoint] #/n[ire]
+                     tmp=inptrs.variables[varis_bgt][timestep,:,npoint] #/n[ire]
                      tmp=tmp*cscale[iv]
                      if (varis_bgt == "MPDT" or varis_bgt == "STEND_CLUBB" ):
                         tmp=tmp/1004

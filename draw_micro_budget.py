@@ -14,7 +14,7 @@ import os
 from subprocess import call
 
  
-def draw_micro_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname,dofv,datapath):
+def draw_micro_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname,dofv,datapath,inst_time_string):
 
 # ncases, the number of models
 # cases, the name of models
@@ -150,7 +150,12 @@ def draw_micro_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
 
 
              ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
-             infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+             if inst_time_string==None:
+                 infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+                 timestep=0
+             else:
+                 infiles[im]= filepath[im]+'/'+cases[im]+inst_time_string[0]
+                 timestep = inst_time_string[1]
              inptrs = Dataset(infiles[im],'r')       # pointer to file1
              lat=inptrs.variables['lat'][:]
              nlat=len(lat)
@@ -178,19 +183,19 @@ def draw_micro_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
                        npointlat=idx_lats[ire,0]
                        npointlon=idx_lons[ire,0]
                      if(dofv):
-                       tmp=inptrs.variables[varis_bgt][0,:,npointlat,npointlon] #/n[ire]
+                       tmp=inptrs.variables[varis_bgt][timestep,:,npointlat,npointlon] #/n[ire]
                      else:
-                       tmp=inptrs.variables[varis_bgt][0,:,npoint] #/n[ire]
+                       tmp=inptrs.variables[varis_bgt][timestep,:,npoint] #/n[ire]
                      tmp=tmp*cscale[iv]
                      if(dofv):
-                       lcldm=inptrs.variables['CLOUD'][0,:,npointlat,npointlon] 
+                       lcldm=inptrs.variables['CLOUD'][timestep,:,npointlat,npointlon] 
                      else:
-                       lcldm=inptrs.variables['CLOUD'][0,:,npoint] 
+                       lcldm=inptrs.variables['CLOUD'][timestep,:,npoint] 
                      icldm=lcldm
                      if(dofv):
-                       precip_frac=inptrs.variables['FREQR'][0,:,npointlat,npointlon]
+                       precip_frac=inptrs.variables['FREQR'][timestep,:,npointlat,npointlon]
                      else:
-                       precip_frac=inptrs.variables['FREQR'][0,:,npoint]
+                       precip_frac=inptrs.variables['FREQR'][timestep,:,npoint]
 
                      if (varis_bgt == 'MPDT' or varis_bgt == 'STEND_CLUBB' ):
                         tmp=tmp/1004

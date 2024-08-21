@@ -13,7 +13,7 @@ import os
 from subprocess import call
 
 
-def silhs_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,datapath):
+def silhs_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,datapath,inst_time_string):
 
 # ncases, the number of models
 # cases, the name of models
@@ -105,7 +105,12 @@ def silhs_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filep
 
          for im in range (0,ncases):
              ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
-             infiles[im]= filepath[im]+cases[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+             if inst_time_string==None:
+                 infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+                 timestep=0
+             else:
+                 infiles[im]= filepath[im]+'/'+cases[im]+inst_time_string[0]
+                 timestep = inst_time_string[1]
              inptrs = Dataset(infiles[im],'r')       # pointer to file1
              lat=inptrs.variables['lat'][:]
              nlat=len(lat)
@@ -123,10 +128,10 @@ def silhs_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filep
              for subc in range( 0, n[ire]):
                  npoint=idx_cols[ire,n[subc]-1]-1
                  if (varis[iv] == 'THETA'):
-                     tmp = inptrs.variables['T'][0,:,npoint]
+                     tmp = inptrs.variables['T'][timestep,:,npoint]
                      hyam =inptrs.variables['hyam'][:]
                      hybm =inptrs.variables['hybm'][:]
-                     ps=inptrs.variables['PS'][0,npoint] 
+                     ps=inptrs.variables['PS'][timestep,npoint] 
                      ps=ps
                      p0=inptrs.variables['P0']
                      pre = np.zeros((nlev),np.float32)
@@ -136,7 +141,7 @@ def silhs_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filep
                      theunits=str(cscale[iv])+inptrs.variables['T'].units
 
                  else:
-                     tmp=inptrs.variables[varis[iv]][0,:,npoint] 
+                     tmp=inptrs.variables[varis[iv]][timestep,:,npoint] 
                      theunits=str(cscale[iv])+inptrs.variables[varis[iv]].units
                  A_field[im,:] = (A_field[im,:]+tmp[:]/n[ire]).astype(np.float32 )
              A_field[im,:] = A_field[im,:] *cscale[iv]

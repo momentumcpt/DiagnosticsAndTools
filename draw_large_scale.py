@@ -14,7 +14,7 @@ import Common_functions
 import os
 from subprocess import call
 
-def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs, casedir, dofv, datapath, pname, underlev):
+def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs, casedir, dofv, datapath, inst_time_string, pname, underlev):
 
 
 # ncases, the number of models
@@ -154,7 +154,12 @@ def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons,
 
          for im in range (0,ncases):
              ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
-             infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+             if inst_time_string == None:
+                 infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+                 timestep=0
+             else:
+                 infiles[im]= filepath[im]+'/'+cases[im]+inst_time_string[0]
+                 timestep = inst_time_string[1]
              inptrs = Dataset(infiles[im],'r')       # pointer to file1
              lat=inptrs.variables['lat'][:]
              nlat=len(lat)
@@ -179,9 +184,9 @@ def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons,
                   npointlat=idx_lats[ire,0]
                   npointlon=idx_lons[ire,0]
                  if (dofv):
-                   ps=inptrs.variables['PS'][0,npointlat,npointlon]
+                   ps=inptrs.variables['PS'][timestep,npointlat,npointlon]
                  else:
-                   ps=inptrs.variables['PS'][0,npoint]
+                   ps=inptrs.variables['PS'][timestep,npoint]
                  ps=ps
                  p0=100000.0  #CAM uses a hard-coded p0
                  pre = np.zeros((nlev),np.float32)
@@ -192,18 +197,18 @@ def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons,
                  lev = pre/100
                  if (varis[iv] == 'THETA'):
                      if (dofv):
-                       tmp = inptrs.variables['T'][0,:,npointlat,npointlon]
+                       tmp = inptrs.variables['T'][timestep,:,npointlat,npointlon]
                      else:
-                       tmp = inptrs.variables['T'][0,:,npoint]                  
+                       tmp = inptrs.variables['T'][timestep,:,npoint]                  
                      for il in range (0, nlev):
                          tmp[il] = tmp[il] * (100000/pre[il])**0.286
                      theunits=str(cscale[iv])+"x"+inptrs.variables['T'].units
 
                  else:
                      if(dofv):
-                       tmp=inptrs.variables[varis[iv]][0,:,npointlat,npointlon] 
+                       tmp=inptrs.variables[varis[iv]][timestep,:,npointlat,npointlon] 
                      else:
-                       tmp=inptrs.variables[varis[iv]][0,:,npoint] 
+                       tmp=inptrs.variables[varis[iv]][timestep,:,npoint] 
                      theunits=str(cscale[iv])+"x"+inptrs.variables[varis[iv]].units
                  ##import pdb; pdb.set_trace()
                  A_field[im,:] = (A_field[im,:]+tmp[:]/n[ire]).astype(np.float32 )
