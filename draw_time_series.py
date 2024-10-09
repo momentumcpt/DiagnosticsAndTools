@@ -17,7 +17,7 @@ import Common_functions
 from subprocess import call
 
 
-def ts_plots(ptype,cseason, varis, ncases, cases, casenames, nsite, lats, lons,years,nyear, filepath, filepathobs,casedir, dofv,datapath):
+def ts_plots(ptype,pname,cseason, varis, ncases, cases, casenames, nsite, lats, lons,years,nyear, filepath, filepathobs,casedir, dofv,datapath):
 
 # ncases, the number of models
 # cases, the name of models
@@ -39,9 +39,6 @@ def ts_plots(ptype,cseason, varis, ncases, cases, casenames, nsite, lats, lons,y
  ncdfs    = ["" for x in range(ncases)]
  nregions = nsite
 
-# varis    = [ "TS", "CLDLOW", "SHFLX", "LHFLX", "FSNS", "FLNS", \
-#              "SWCF", "LWCF", "PRECC", "PRECL", "PRECT", "FSNT", \
-#              "FLNT", "TMQ", "PSL", "TGCLDLWP", "TGCLPIWP", "U10" ]
  nvaris = len(varis)
  cscale = [1, 1, 1, 1, 1., 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
  plotts=["" for x in range(nsite)]
@@ -70,8 +67,8 @@ def ts_plots(ptype,cseason, varis, ncases, cases, casenames, nsite, lats, lons,y
      if not os.path.exists(casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N'):
          os.mkdir(casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N')
 
-     plotname = casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N/CLUBB_time_series_'+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
-     plotts[ire] = 'CLUBB_time_series_'+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
+     plotname = casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N/'+pname+'_'+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
+     plotts[ire] = pname+'_'+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
      wks= Ngl.open_wks(ptype,plotname)
 
      Ngl.define_colormap(wks,"GMT_paired")
@@ -110,7 +107,6 @@ def ts_plots(ptype,cseason, varis, ncases, cases, casenames, nsite, lats, lons,y
 
 
      for iv in range (0, nvaris):
-         print(varis[iv]) 
          if(iv == nvaris-1):
              res.pmLegendDisplayMode    = "NEVER"
              res.xyExplicitLegendLabels = casenames[:]
@@ -129,9 +125,6 @@ def ts_plots(ptype,cseason, varis, ncases, cases, casenames, nsite, lats, lons,y
          for im in range (0,ncases):
              ncdfs[im]  = datapath+"/"+cases[im]+'_site_location.nc'
              infiles=f"{datapath}/{casenames[im]}_timeseries.nc" 
-#             for i in range(nyear[im]):
-#                 infiles=infiles+filepath[im]+f"/*cam.h0."+str(years[im]+i).rjust(4,'0')+"*"
-             print("infiles = ",infiles)
              inptrs = xr.open_dataset(infiles)       # pointer to file1
              lat=np.array(inptrs['lat'][:])
              nlat=len(lat)
@@ -157,7 +150,6 @@ def ts_plots(ptype,cseason, varis, ncases, cases, casenames, nsite, lats, lons,y
                  else:
                    tmp=np.array(inptrs[varis[iv]])[:,npoint]
                  theunits=str(cscale[iv])+inptrs[varis[iv]].units
-                 print("A_field.shape, tmp.shape = ",A_field.shape,tmp.shape)
                  A_field[im,:] = (A_field[im,:]+tmp[:]/n[ire]).astype(np.float32 )
              A_field[im,:] = A_field[im,:] *cscale[iv]
              inptrs.close()
