@@ -198,14 +198,18 @@ if drawskw:
 
 if drawts:
     print('Drawing time series on selected sites')
+
+    pname = "ts1"
     varis = [ "TS", "CLDLOW", "SHFLX", "LHFLX", "FSNS", "FLNS"]
-    plotts1=draw_time_series.ts_plots(ptype,cseason, varis, ncases, cases, casenames, nsite, lats, lons, years, nyear, filepath, filepathobs,casedir,calfvsite,datapath)
+    plotts1=draw_time_series.ts_plots(ptype,pname,cseason, varis, ncases, cases, casenames, nsite, lats, lons, years, nyear, filepath, filepathobs,casedir,calfvsite,datapath)
 
+    pname = "ts2"
     varis =[ "SWCF", "LWCF", "PRECC", "PRECL", "TAUX", "TAUY"]
-    plotts2=draw_time_series.ts_plots(ptype,cseason, varis, ncases, cases, casenames, nsite, lats, lons, years, nyear, filepath, filepathobs,casedir,calfvsite,datapath)
+    plotts2=draw_time_series.ts_plots(ptype,pname,cseason, varis, ncases, cases, casenames, nsite, lats, lons, years, nyear, filepath, filepathobs,casedir,calfvsite,datapath)
 
+    pname = "ts3"
     varis =[ "FSNT", "FLNT", "TMQ", "TGCLDLWP", "TGCLDIWP", "U10" ]
-    plotts3=draw_time_series.ts_plots(ptype,cseason, varis, ncases, cases, casenames, nsite, lats, lons, years, nyear, filepath, filepathobs,casedir,calfvsite,datapath)
+    plotts3=draw_time_series.ts_plots(ptype,pname,cseason, varis, ncases, cases, casenames, nsite, lats, lons, years, nyear, filepath, filepathobs,casedir,calfvsite,datapath)
 
 if drawsilhs:
     print('CLUBB standard variables on selected sites')
