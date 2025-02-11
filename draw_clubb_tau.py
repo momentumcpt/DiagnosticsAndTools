@@ -14,8 +14,6 @@ import os
 from subprocess import call
 import Common_functions
 
-
- 
 def draw_clubb_tau (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname,datapath):
 
 # ncases, the number of models
@@ -288,8 +286,6 @@ def draw_clubb_tau (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
 
              p = Ngl.xy(wks,A_field,ilev,res)
              plot.append(p)
-
-
 
              xp=np.mod(iv,2)
              yp=int(iv/2)

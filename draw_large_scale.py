@@ -1,20 +1,28 @@
 '''
     Large-scale variables (compared with observations)
-    zhunguo : guozhun@lasg.iap.ac.cn ; guozhun@uwm.edu
+    Updates on Jan 2025
+    Zhun Guo : guozhun@lasg.iap.ac.cn ; guozhun@uwm.edu
+    Kate Thayer-Calder
+    Benjamin A. Stephens:stepheba@ucar.edu
 '''
 
-
-import Ngl
 from netCDF4 import Dataset
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
-#import pylab
+import pylab
 import Common_functions
 import os
+import matplotlib.gridspec as gridspec
+import matplotlib.ticker as ticker
+import cartopy.crs as ccrs
+import cmaps
+
+from matplotlib import font_manager as fm
+from scipy.interpolate import griddata
 from subprocess import call
 
-def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs, casedir, dofv, datapath, pname, underlev):
+def large_scale_prf (ptype,pixel,cseason, top_level, ncases, cases, casenames, nsite, lats, lons, climopath, filepathobs, casedir,dofv, datapath,pname):
 
 
 # ncases, the number of models
@@ -26,13 +34,6 @@ def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons,
  if not os.path.exists(casedir):
         os.mkdir(casedir)
 
- _Font   = 25
- interp = 2
- extrap = False
- mkres = Ngl.Resources()
- mkres.gsMarkerIndex = 2
- mkres.gsMarkerColor = "Red"
- mkres.gsMarkerSizeF = 15.
  infiles  = ["" for x in range(ncases)]
  ncdfs    = ["" for x in range(ncases)]
  nregions = nsite
@@ -42,76 +43,26 @@ def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons,
  nvaris = len(varis)
  cunits = ["%","mba/day","g/kg","g/kg","K", "%", "m/s", "g/kg", "m/s", "m/s","K","m" ]
  cscale = [100,      864,  1000, 1000 , 1.,   1,     1,   1000,     1,1,1,1,1,1,1 ]
- cscaleobs = [100,        1,     1, 1000 , 1.,   1,     1,   1000,     1,1,1,1,1,1,1]
- obsdataset =["ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI","ERAI","ERAI"]
+ cscaleobs  = [100,        1,     1, 1000 , 1.,   1,     1,   1000,     1,1,1,1,1,1,1]
+ obsdataset = ["ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI","ERAI","ERAI"]
+ rangeyr    = ['197901_201612','197901_201612','197901_201612','197901_201612','197901_201612','197901_201612','197901_201612','197901_201612','197901_201612','197901_201612']
 
  plotlgs=["" for x in range(nsite)]
-
 
  for ire in range (0, nsite):
      if not os.path.exists(casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N'):
          os.mkdir(casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N')
+     if(top_level  == 0):
+           plotname = casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N/'+pname+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
+           plotlgs[ire] = pname+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
+     else:
+           plotname = casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N/lev_'+pname+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
+           plotlgs[ire] = 'lev_'+pname+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
 
-     plotname = casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N/'+pname+'_'+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
-     plotlgs[ire] = pname+'_'+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
+     fig, axes = plt.subplots( nrows=3, ncols=3, figsize=(15, 15 )) 
+     axes      = axes.flatten()
 
-     wks= Ngl.open_wks(ptype,plotname)
-     Ngl.define_colormap(wks,"GMT_paired")
-     plot = []
-
-     res     = Ngl.Resources()
-     res.nglMaximize          =  False
-     res.nglDraw              = False
-     res.nglFrame             = False
-     res.lgPerimOn              = False                 # no box around
-     res.vpWidthF         = 0.30                      # set width and height
-     res.vpHeightF        = 0.30
-
-     res.tiYAxisString   = "Pressure [hPa]"
-     res.tiMainFont        = _Font
-     res.tmYLLabelFont  = _Font
-     res.tmXBLabelFont  = _Font
-     res.tiYAxisFont =  _Font
-     res.tiXAxisFont =  _Font
-
-     res.tmXBLabelFontHeightF = 0.01
-     res.tmXBLabelFontThicknessF = 1.0
-     res.xyMarkLineMode      = 'Lines'
-
-#     res.tmXBLabelAngleF = 45
-     res.xyLineThicknesses = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0,3.,3.,3.,3.,3,3,3,3,3,3,3]
-
-     res.xyDashPatterns    = np.arange(0,24,1)
-
-     pres            = Ngl.Resources()
-     pres.nglFrame = False
-     pres.txString   = "Large-scale VAR at"+ str(lons[ire])+"E,"+str(lats[ire])+"N"
-     pres.txFont = _Font
-     pres.nglPanelYWhiteSpacePercent = 5
-     pres.nglPanelXWhiteSpacePercent = 5
-     pres.nglPanelTop = 0.88
-     pres.wkPaperWidthF  = 17  # in inches
-     pres.wkPaperHeightF = 28  # in inches
-     pres.nglMaximize = True
-     pres.wkWidth = 10000
-     pres.wkHeight = 10000
-
-
-     for iv in range (0, nvaris):   
-         if(iv == nvaris-1):
-             res.pmLegendDisplayMode    = "NEVER"
-             res.xyExplicitLegendLabels = casenames[:]
-             res.pmLegendSide           = "top"             
-             res.pmLegendParallelPosF   = 0.6               
-             res.pmLegendOrthogonalPosF = -0.5                  
-             res.pmLegendWidthF         = 0.10              
-             res.pmLegendHeightF        = 0.10          
-             res.lgLabelFontHeightF     = .02               
-             res.lgLabelFontThicknessF  = 1.5
-             res.lgPerimOn              = True
-         else:
-             res.pmLegendDisplayMode    = "NEVER"
-
+     for iv in range (0, nvaris): 
 
          if(obsdataset[iv] =="CCCM"):
              if(cseason == "ANN"):
@@ -129,7 +80,8 @@ def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons,
              if (varisobs[iv] =="PRECT"):
                  fileobs = filepathobs+'/GPCP_'+cseason+'_climo.nc'
              else:
-                 fileobs = filepathobs + obsdataset[iv]+'_'+cseason+'_climo.nc'
+              #   fileobs = filepathobs + '/'+obsdataset[iv]+'/'+obsdataset[iv]+'_'+cseason+'_'+rangeyr[iv]+'_climo.nc'
+                 fileobs = filepathobs + '/'+obsdataset[iv]+'_'+cseason+'_climo.nc'
              inptrobs = Dataset(fileobs,'r')
              if (varisobs[iv] =="THETA"):
                  latobs=inptrobs.variables['lat'][:]
@@ -151,10 +103,11 @@ def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons,
 
          B[:]=B[:] * cscaleobs[iv]
 
+         ax = axes[iv]
 
          for im in range (0,ncases):
              ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
-             infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+             infiles[im]= climopath[im][0]+cases[im]+climopath[im][1]+cases[im]+'_'+cseason+'_climo.nc'
              inptrs = Dataset(infiles[im],'r')       # pointer to file1
              lat=inptrs.variables['lat'][:]
              nlat=len(lat)
@@ -165,102 +118,81 @@ def large_scale_prf (ptype,cseason, ncases, cases, casenames, nsite, lats, lons,
              ncdf= Dataset(ncdfs[im],'r')
              n   =ncdf.variables['n'][:]
              idx_cols=ncdf.variables['idx_cols'][:,:]
-             if (dofv):
-               idx_lats=ncdf.variables['idx_coord_lat'][:,:]
-               idx_lons=ncdf.variables['idx_coord_lon'][:,:]
+             if (dofv[im]):
+                 idx_lats=ncdf.variables['idx_coord_lat'][:,:]
+                 idx_lons=ncdf.variables['idx_coord_lon'][:,:]
              ncdf.close()
-             theunits = "[units]"
-             if (im ==0 ):
+             if (im ==0):
                  A_field = np.zeros((ncases,nlev),np.float32)
+                 lev0=lev
 
              for subc in range( 0, n[ire]):
                  npoint=idx_cols[ire,n[subc]-1]-1
-                 if(dofv):
-                  npointlat=idx_lats[ire,0]
-                  npointlon=idx_lons[ire,0]
-                 if (dofv):
-                   ps=inptrs.variables['PS'][0,npointlat,npointlon]
+                 if (dofv[im]):
+                    npointlat=idx_lats[ire,0]
+                    npointlon=idx_lons[ire,0]
+                 if (dofv[im]):
+                    ps=inptrs.variables['PS'][0,npointlat,npointlon]
                  else:
-                   ps=inptrs.variables['PS'][0,npoint]
+                    ps=inptrs.variables['PS'][0,npoint]
+
+                 hyam =inptrs.variables['hyam'][:]
+                 hybm =inptrs.variables['hybm'][:]
                  ps=ps
-                 p0=100000.0  #CAM uses a hard-coded p0
+                 p0=100000 #inptrs.variables['P0']
                  pre = np.zeros((nlev),np.float32)
-                 hyam=inptrs.variables['hyam'][:]
-                 hybm=inptrs.variables['hybm'][:]
+
                  for il in range (0, nlev):
                      pre[il] = hyam[il]*p0 + hybm[il] * ps
                  lev = pre/100
+
                  if (varis[iv] == 'THETA'):
-                     if (dofv):
+                     if (dofv[im]):
                        tmp = inptrs.variables['T'][0,:,npointlat,npointlon]
                      else:
-                       tmp = inptrs.variables['T'][0,:,npoint]                  
+                       tmp = inptrs.variables['T'][0,:,npoint]
                      for il in range (0, nlev):
                          tmp[il] = tmp[il] * (100000/pre[il])**0.286
                      theunits=str(cscale[iv])+"x"+inptrs.variables['T'].units
-
                  else:
-                     if(dofv):
-                       tmp=inptrs.variables[varis[iv]][0,:,npointlat,npointlon] 
+                     if(dofv[im]):
+                       tmp=inptrs.variables[varis[iv]][0,:,npointlat,npointlon]
                      else:
                        tmp=inptrs.variables[varis[iv]][0,:,npoint] 
                      theunits=str(cscale[iv])+"x"+inptrs.variables[varis[iv]].units
-                 ##import pdb; pdb.set_trace()
-                 A_field[im,:] = (A_field[im,:]+tmp[:]/n[ire]).astype(np.float32 )
+                     
+                 tmp_o = np.interp(pre, lev, tmp)
+
+                 A_field[im,:] = (A_field[im,:]+tmp_o[:]/n[ire]).astype(np.float32 )
 
              A_field[im,:] = A_field[im,:] *cscale[iv]
+             ax.plot(A_field[im, :], pre, label=cases[im])
              inptrs.close()
 
-         if underlev == 0:
-             levind=0
-             levindobs=len(pre1)
-         else:
-             pre1b=np.absolute(pre1-underlev)
-             levindobs=pre1b.argmin()
-             levb=np.absolute(lev-underlev)
-             levind=levb.argmin()
+         ax.plot( B,pre1, label='OBS', linestyle='--')
 
-         res.tiMainString  =  varis[iv]+"  "+theunits
-         res.trXMinF = min(np.min(A_field[:, levind:]),np.min(B[:levindobs]))
-         res.trXMaxF = max(np.max(A_field[:, levind:]),np.max(B[:levindobs]))
-         res.trYMinF = max(np.min(lev),underlev)
-         res.trYMaxF = np.max(lev)
-         if underlev == 0:
-             if(varis[iv] == "THETA"):
-                 res.trXMinF = 270.
-                 res.trXMaxF = 400.
-             if(varis[iv] == "CLOUD" or varis[iv] =="RELHUM") :
-                 res.trXMinF = 0.
-                 res.trXMaxF = 100.
-             if(varis[iv] == "T") :
-                 res.trXMinF = 180
-                 res.trXMaxF = 300
-             if(varis[iv] == "U") :
-                 res.trXMinF = -40
-                 res.trXMaxF = 40
-         res.trYReverse        = True
-         res.xyLineColors      = np.arange(3,20,2)
-         res.xyMarkerColors    = np.arange(2,20,2)
-         p = Ngl.xy(wks,A_field,lev,res)
-         
-         res.trYReverse        = False
-         res.xyLineColors      = ["black"]
-         pt = Ngl.xy(wks,B,pre1,res)
-         Ngl.overlay(p,pt)
-         plot.append(p)
+         if(varis[iv] == "THETA"):
+             ax.set_xlim(270, 400)
+         if(varis[iv] == "CLOUD" or varis[iv] =="RELHUM") :
+             ax.set_xlim(0, 100)
+         if(varis[iv] == "T") :
+             ax.set_xlim(180, 300)
+         if(varis[iv] == "U") :
+             ax.set_xlim(-40, 40)
 
-     Ngl.panel(wks,plot[:],[nvaris/3,3],pres)
-     txres = Ngl.Resources()
-     txres.txFontHeightF = 0.02
-     txres.txFont        = _Font
-     Ngl.text_ndc(wks,"Large-scale VAR at"+ str(lons[ire])+"E,"+str(lats[ire])+"N",0.5,0.92+ncases*0.01,txres)
-     Common_functions.create_legend(wks,casenames,0.02,np.arange(3,20,2),0.1,0.89+ncases*0.01)
+         ax.set_ylim(bottom=top_level, top=1000)
+         ax.set_xlabel('Value')
+         ax.grid(True)
+         ax.set_title(f'({varis[iv] if iv < len(varis) else "Unknown"})')
+         ax.set_ylabel('Pressure Level (hPa)')  #
+         ax.set_xlabel(theunits)  # 
+         ax.legend()  
+         ax.invert_yaxis()
 
-
-     Ngl.frame(wks)
-     Ngl.destroy(wks)
+     title_text = f"Large-scale VAR at {lons[ire]}E, {lats[ire]}N"
+     fig.suptitle(title_text,fontsize=16, ha='center', va='center')
+     plt.tight_layout(rect=[0, 0, 1, 0.96])
+     plt.savefig(plotname+'.'+ptype, dpi=pixel)
+     plt.close()
 
  return plotlgs
-
-     
-

@@ -1,9 +1,12 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr 10 13:24:40 2017
+Created on Mon Apr 10 13:24:40 2019
+    Updates on Jan 2025
+    Zhun Guo : guozhun@lasg.iap.ac.cn ; guozhun@uwm.edu
+    Kate Thayer-Calder
+    Benjamin A. Stephens:stepheba@ucar.edu
 
-@author: zhunguo, guozhun@uwm.edu, guozhun@lasg.iap.ac.cn 
 """
 
 from netCDF4 import Dataset
@@ -18,24 +21,24 @@ def closest_idx(lst, K):
 
     return min(range(len(lst)), key = lambda i: abs(lst[i]-K))
 
-def pick_out(ncases, cases,years, nsite,lats, lons,area, filepath,casedir,fv,datapath):
+def pick_out(ncases, cases,years, nsite,lats, lons,area, climopath,runfilepath,casedir, ncopath,fv,datapath):
 # ncases, the number of models
 # cases, the name of models
 # casename, the name of cases
-# filepath, model output filepath
+# climopath, climatology file path
 # filepathobs, filepath for observational data
 # fv, calculate indices for fv dycore
- print(ncases)
+
 # inptrs = [ncases]
 
  if not os.path.exists(datapath):
         os.mkdir(datapath)
 
-
+ ncea_str=ncopath+'ncea '
+ ncks_str=ncopath+'ncks '
+ stre="%5.2f\n"
  for im in range(0,ncases):
-    
-     infile=filepath[im]+cases[im]+'.cam.h0a.'+str(years[im]).rjust(4,'0')+'-01.nc'
-
+     infile=climopath[im][0]+cases[im]+climopath[im][1]+cases[im]+'_ANN_climo.nc'
      print(infile)
      print(im)
      inptrs = Dataset(infile,'r')       # pointer to file1
@@ -49,11 +52,11 @@ def pick_out(ncases, cases,years, nsite,lats, lons,area, filepath,casedir,fv,dat
      cols=[0,1,2,3,4]
      sits=np.linspace(0,nsite-1,nsite)
 
-     txtfile1=filepath[im]+cases[im]+'/run/diff*.asc'
-     txtfile2=filepath[im]+cases[im]+'/run/log*.asc'
-     os.system('mkdir '+ casedir+'/txt/')
-     os.system('cp -f '+ txtfile1+ ' '+ casedir+'/txt/')
-     os.system('cp -f '+ txtfile2+ ' '+ casedir+'/txt/')
+     txtfile1=runfilepath[im][0]+cases[im]+runfilepath[im][1]+'/diff*.asc'
+     txtfile2=runfilepath[im][0]+cases[im]+runfilepath[im][1]+'/log*.asc'
+#     os.system('mkdir '+ casedir+'/txt/')
+#     os.system('cp -f '+ txtfile1+ ' '+ casedir+'/txt/')
+#     os.system('cp -f '+ txtfile2+ ' '+ casedir+'/txt/')
 
 
      os.system('rm -f '+datapath+cases[im]+'_site_location.nc')
@@ -75,8 +78,10 @@ def pick_out(ncases, cases,years, nsite,lats, lons,area, filepath,casedir,fv,dat
 # ========================================================================== 
 # find out the cols and their numbers
 #    the axis of site is stored in idx_cols(site,n)
-
-     if(fv):
+#     localtxt=''
+     os.system('set sw_ea = 0')
+     os.system('set num = 0')
+     if(fv[im]):
        for s in range(0,nsite):
          A = lons[s]
          B = lats[s]

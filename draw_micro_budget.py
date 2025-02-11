@@ -1,38 +1,36 @@
 '''
-    CLUBB budgets
+    Microphys budgets
     zhunguo : guozhun@lasg.iap.ac.cn ; guozhun@uwm.edu
 '''
-  
 
-import Ngl
 from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
 import pylab
+import Common_functions
 import os
+import matplotlib.gridspec as gridspec
+import matplotlib.ticker as ticker
+import cartopy.crs as ccr
+import cmaps
+
+from matplotlib import font_manager as fm
+from scipy.interpolate import griddata
 from subprocess import call
 
- 
-def draw_micro_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, filepath, filepathobs,casedir,varis,vname,cscale,chscale,pname,dofv,datapath):
+def draw_micro_bgt (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsite, lats, lons, climopath, filepathobs,casedir,varis,vname,cscale,chscale,pname,dofv,datapath):
+
 
 # ncases, the number of models
 # cases, the name of models
 # casename, the name of cases
-# filepath, model output filepath
+# climopath, model output filepath
 # filepathobs, filepath for observational data
 # inptrs = [ncases]
  if not os.path.exists(casedir):
         os.mkdir(casedir)
 
-
- _Font   = 25
- interp = 2
- extrap = False
- mkres = Ngl.Resources()
- mkres.gsMarkerIndex = 2
- mkres.gsMarkerColor = 'Red'
- mkres.gsMarkerSizeF = 15.   
  infiles  = ['' for x in range(ncases)]
  ncdfs    = ['' for x in range(ncases)]
  nregions = nsite
@@ -49,60 +47,11 @@ def draw_micro_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
          plotname = casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N/'+pname+'_'+casenames[im]+'_'+str(lons[ire])+'E_'+str(lats[ire])+'N_'+cseason
          plotmicrobgt[im+ncases*ire] = pname+'_'+casenames[im]+'_'+str(lons[ire])+'E_'+str(lats[ire])+'N_'+cseason
 
-         wks= Ngl.open_wks(ptype,plotname)
-
-         Ngl.define_colormap(wks,'radar')
-         plot = []
-         res     = Ngl.Resources()  
-         res.nglDraw              = False
-         res.nglFrame             = False
-         res.lgLabelFontHeightF     = .012                   # change font height
-         res.lgPerimOn              = False                 # no box around
-         res.vpWidthF         = 0.30                      # set width and height
-         res.vpHeightF        = 0.30
-
-#         res.txFontHeightF   = .01
-         #  res.vpXF             = 0.04
-         # res.vpYF             = 0.30
-         res.tmYLLabelFont  = 12
-         res.tmXBLabelFont  = 12
-         res.tmXBLabelFontHeightF = 0.01
-         res.tmXBLabelFontThicknessF = 1.0
-         res.xyMarkLineMode      = 'MarkLines'
-         res.xyLineThicknesses = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0,3.,3.,3.,3.,3,3,3,3,3,3,3]
-         res.xyLineColors      = np.arange(2,16,1)
-         res.xyDashPatterns    = np.arange(0,24,1)
-         res.xyMarkers         = np.arange(16,40,1)
-         res.xyMarkerSizeF       = 0.005
-         res.xyMarkerColors      = np.arange(2,16,1)
-         res.pmLegendDisplayMode    = 'ALWAYS'
-         res.pmLegendSide           = 'top'                 # Change location of
-         res.pmLegendParallelPosF   = 0.6                  # move units right
-         res.pmLegendOrthogonalPosF = -0.55                  # more neg = down
-         res.pmLegendWidthF         = 0.2       # Decrease width
-         res.pmLegendHeightF        = 0.1       # Decrease height
-         res.lgBoxMinorExtentF      = 0.1       # Shorten the legend lines
-         res.lgLabelFontHeightF     = 0.015     # Change the font size
-         res.lgPerimOn              = True
-         res.tiYAxisString   = 'PRESSURE'
-     
-#         res.nglLeftString     = varis[iv]
-#         res.nglRightString    = cunits[iv]
-         res.trYReverse        = True
-
-         pres            = Ngl.Resources() 
-#         pres.nglMaximize = True
-
-         pres.nglFrame = False
-         pres.txFont = 12
-         pres.nglPanelYWhiteSpacePercent = 5
-         pres.nglPanelXWhiteSpacePercent = 5
-         pres.nglPanelTop = 0.93
-
-         txres               = Ngl.Resources()
-#         txres.txFontHeightF = 0.01
+         fig, axes = plt.subplots( nrows=nvaris//2, ncols=2, figsize=(15, 15 ))
+         axes      = axes.flatten()
 
          for iv in range (0, nvaris):
+             ax = axes[iv]
 
              if (varis[iv] == 'MPDLIQ' ):   # LIQ
                 budget_ends = ['PRCO',  'PRAO', 'MNUCCCO', 'MNUCCTO', 'MSACWIO', 'PSACWSO', 'BERGSO','BERGO']
@@ -150,7 +99,7 @@ def draw_micro_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
 
 
              ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
-             infiles[im]= filepath[im]+'/'+cases[im]+'_'+cseason+'_climo.nc'
+             infiles[im]= climopath[im][0]+cases[im]+climopath[im][1]+cases[im]+'_'+cseason+'_climo.nc'
              inptrs = Dataset(infiles[im],'r')       # pointer to file1
              lat=inptrs.variables['lat'][:]
              nlat=len(lat)
@@ -161,33 +110,32 @@ def draw_micro_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
              ncdf= Dataset(ncdfs[im],'r')
              n   =ncdf.variables['n'][:]
              idx_cols=ncdf.variables['idx_cols'][:,:]
-             if (dofv):
+             if (dofv[im]):
                idx_lats=ncdf.variables['idx_coord_lat'][:,:]
                idx_lons=ncdf.variables['idx_coord_lon'][:,:]
              ncdf.close()
              A_field = np.zeros((nterms,nilev),np.float32)
-             theunits=str(chscale[iv])+'x'+inptrs.variables[varis[iv]].units
-             res.tiMainString    =  vname[iv]+'  '+theunits 
+             theunits=str(chscale[iv])+'x'+inptrs.variables[budget_ends[0]].units
 
 
              for it in range(0, nterms):
                  for subc in range( 0, n[ire]):
                      varis_bgt= budget_ends[it]
                      npoint=idx_cols[ire,n[subc]-1]-1
-                     if(dofv):
+                     if(dofv[im]):
                        npointlat=idx_lats[ire,0]
                        npointlon=idx_lons[ire,0]
-                     if(dofv):
-                       tmp=inptrs.variables[varis_bgt][0,:,npointlat,npointlon] #/n[ire]
+                     if(dofv[im]):
+                       tmp=inptrs.variables[varis_bgt][0,:,npointlat,npointlon]
                      else:
                        tmp=inptrs.variables[varis_bgt][0,:,npoint] #/n[ire]
                      tmp=tmp*cscale[iv]
-                     if(dofv):
+                     if(dofv[im]):
                        lcldm=inptrs.variables['CLOUD'][0,:,npointlat,npointlon] 
                      else:
                        lcldm=inptrs.variables['CLOUD'][0,:,npoint] 
                      icldm=lcldm
-                     if(dofv):
+                     if(dofv[im]):
                        precip_frac=inptrs.variables['FREQR'][0,:,npointlat,npointlon]
                      else:
                        precip_frac=inptrs.variables['FREQR'][0,:,npoint]
@@ -227,30 +175,30 @@ def draw_micro_bgt (ptype,cseason, ncases, cases, casenames, nsite, lats, lons, 
 
                      A_field[it,:] = (A_field[it,:]+tmp[:]/n[ire]).astype(np.float32 )
 
+                 ax.plot(A_field[it, :],ilev, label=varis_bgt[:])
              inptrs.close()
-             res.xyExplicitLegendLabels =  budget_ends[:]
-             p = Ngl.xy(wks,A_field,ilev,res)
-             plot.append(p)
+             ax.set_title(f'({varis[iv] if iv < len(varis) else "Unknown"})')
+             levind= top_level//1000*72
+             if (np.abs(np.min(A_field[:, levind:])) <= 0.001*np.abs(np.max(A_field[:, levind:]))):
+                 lest=0
+             else:
+                 lest=np.min(A_field[:, levind:])
+             maximum = np.max(A_field[:, levind:])
+             ax.set_xlim(lest,maximum)
 
-             xp=np.mod(iv,2)
-             yp=int(iv/2)
+             ax.set_ylim(bottom=top_level, top=1000)
+             ax.set_xlabel('Value')
+             ax.grid(True)
+             ax.set_ylabel('Pressure Level (hPa)')
+             ax.set_xlabel(theunits)
+             ax.legend()
+             ax.invert_yaxis()
 
-         pres.txFontHeightF = 0.02
-         pres.txFont = _Font
-         pres.txString   = casenames[im]+' Microphy BUDGET at' +str(lons[ire])+'E,'+str(lats[ire])+'N'
-
-         if(np.mod(nvaris,2)==1):
-            Ngl.panel(wks,plot[:],[(nvaris)/2+1,2],pres)
-         else:
-            Ngl.panel(wks,plot[:],[(nvaris)/2,2],pres)
-
-         txres = Ngl.Resources()
-         txres.txFontHeightF = 0.020
-         txres.txFont = _Font
-         Ngl.text_ndc(wks,casenames[im]+' Microphy BUDGET at' +str(lons[ire])+'E,'+str(lats[ire])+'N',0.5,0.95,txres)
-
-         Ngl.frame(wks)
-         Ngl.destroy(wks) 
+         title_text = pname+f"{cases[im]} MICROP BUDGET at {lons[ire]}E, {lats[ire]}N"
+         fig.suptitle(title_text,fontsize=16, ha='center', va='center')
+         plt.tight_layout(rect=[0, 0, 1, 0.96])
+         plt.savefig(plotname+'.'+ptype, dpi=pixel)
+         plt.close()
 
  return (plotmicrobgt)
 

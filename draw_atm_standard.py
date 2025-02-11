@@ -1,6 +1,9 @@
 '''
     CLUBB standard variables 
-    zhunguo : guozhun@lasg.iap.ac.cn ; guozhun@uwm.edu
+    Updates on Jan 2025 
+    Zhun Guo : guozhun@lasg.iap.ac.cn ; guozhun@uwm.edu
+    Kate Thayer-Calder
+    Benjamin A. Stephens:stepheba@ucar.edu
 '''
 
 from netCDF4 import Dataset
@@ -19,14 +22,13 @@ from matplotlib import font_manager as fm
 from scipy.interpolate import griddata
 from subprocess import call
 
-
-def clubb_std_prf (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsite, lats, lons, climopath, filepathobs, casedir,varis,cscale,chscale,pname,dofv,datapath):
+def atm_std_prf (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsite, lats, lons, climopath, filepathobs, casedir,varis,cscale,chscale,pname,dofv,datapath):
 
 
 # ncases, the number of models
 # cases, the name of models
 # casename, the name of cases
-# climopath, climatology file path
+# filepath, model output filepath
 # filepathobs, filepath for observational data
 # inptrs = [ncases]
  if not os.path.exists(casedir):
@@ -42,7 +44,7 @@ def clubb_std_prf (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsit
 # cscaleobs = [100,        1,     1, 1000 , 1.,   1,     1,   1000,     1,1,1,1,1,1,1]
 # obsdataset =["ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI","ERAI","ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI","ERAI","ERAI"]
 
- plotclubb=["" for x in range(nsite)]
+ plotstd=["" for x in range(nsite)]
 
 
  for ire in range (0, nsite):
@@ -50,12 +52,12 @@ def clubb_std_prf (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsit
          os.mkdir(casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N')
 
      plotname = casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N/'+pname+'_'+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
-     plotclubb[ire] = pname+'_'+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
+     plotstd[ire] = pname+'_'+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
 
-     fig, axes = plt.subplots( nrows=nvaris//3, ncols=3, figsize=(15, 15 ))
+     fig, axes = plt.subplots( nrows=nvaris//2, ncols=2, figsize=(15, 15 ))
      axes      = axes.flatten()
 
-     for iv in range (0, nvaris):
+     for iv in range (0, nvaris):   
 
          ax = axes[iv]
 
@@ -73,9 +75,6 @@ def clubb_std_prf (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsit
              ncdf= Dataset(ncdfs[im],'r')
              n   =ncdf.variables['n'][:]
              idx_cols=ncdf.variables['idx_cols'][:,:]
-             if (dofv[im]):
-                 idx_lats=ncdf.variables['idx_coord_lat'][:,:]
-                 idx_lons=ncdf.variables['idx_coord_lon'][:,:]
              ncdf.close()
              if (im ==0):
                  A_field = np.zeros((ncases,nlev),np.float32)
@@ -83,35 +82,23 @@ def clubb_std_prf (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsit
 
              for subc in range( 0, n[ire]):
                  npoint=idx_cols[ire,n[subc]-1]-1
-                 if (dofv[im]):
-                    npointlat=idx_lats[ire,0]
-                    npointlon=idx_lons[ire,0]
-                 if (varis[iv] == "SKW"):
+                 if(dofv[im]):
+                     npointlat=idx_lats[ire,0]
+                     npointlon=idx_lons[ire,0]
+                 if varis[iv] in {'rcm'}: 
                      if (dofv[im]):
-                         wp2=inptrs.variables['wp2'][0,:,npointlat,npointlon]
-                         wp3=inptrs.variables['wp3'][0,:,npointlat,npointlon]
+                        tmp=inptrs.variables[varis[iv]][0,:,npointlat,npointlon]
                      else:
-                         wp2=inptrs.variables['wp2'][0,:,npoint]
-                         wp3=inptrs.variables['wp3'][0,:,npoint]
-                     tmp=wp3
-                     tmp=wp3*(wp2**-1.5)
-                     theunits='1' 
+                        tmp=inptrs.variables[varis[iv]][0,:,npoint]
+                     theunits=str(chscale[iv])+'x'+inptrs.variables[varis[iv]].units
+                     tmp_o = np.interp(lev0, ilev, tmp)
                  else:
                      if (dofv[im]):
-                       tmp=inptrs.variables[varis[iv]][0,:,npointlat,npointlon]
+                        tmp=inptrs.variables[varis[iv]][0,:,npointlat,npointlon]
                      else:
-                       tmp=inptrs.variables[varis[iv]][0,:,npoint]
-#                     tmp2=inptrs.variables['C6rt_Skw_fnc'][0,:,npoint]
-#                     tmp3=inptrs.variables['tau_zm'][0,:,npoint]
-#                     t]mp4=inptrs.variables['tau_wpxp_zm'][0,:,npoint]
+                        tmp=inptrs.variables[varis[iv]][0,:,npoint]
                      theunits=str(chscale[iv])+'x'+inptrs.variables[varis[iv]].units
-                     if (varis[iv] == 'tau_zm' or varis[iv] == 'tau_wp2_zm' \
-                        or varis[iv] == 'tau_wp3_zm' or varis[iv] == 'tau_xp2_zm' \
-                        or varis[iv] == 'tau_no_N2_zm' or varis[iv] == 'tau_wpxp_zm'):
-                        tmp=1/tmp
-                        tmp [0:10] = 0.0
-                        theunits=str(chscale[iv])+'x'+inptrs.variables[varis[iv]].units+'^-1'
-                 tmp_o = np.interp(lev0, ilev, tmp)
+                     tmp_o = np.interp(lev0, lev, tmp)
 
                  A_field[im,:] = (A_field[im,:]+tmp_o[:]/n[ire]).astype(np.float32 )
 
@@ -119,11 +106,7 @@ def clubb_std_prf (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsit
              ax.plot(A_field[im, :],lev0, label=cases[im])
              inptrs.close()
 
-         if varis[iv] in {'tau_zm', 'tau_wp2_zm', 'tau_wp3_zm', 'tau_xp2_zm', 'tau_no_N2_zm', 'tau_wpxp_zm', 'tau_tau_bkgnd', 'tau_tau_shear'}:
-               ax.set_title(f'("invrs_"+{varis[iv] if iv < len(varis) else "Unknown"})')              
-         else:
-               ax.set_title(f'({varis[iv] if iv < len(varis) else "Unknown"})')        
-
+         ax.set_title(f'({varis[iv] if iv < len(varis) else "Unknown"})')        
          levind= top_level//1000*72
          if (np.abs(np.min(A_field[:, levind:])) <= 0.001*np.abs(np.max(A_field[:, levind:]))):
              lest=0
@@ -132,7 +115,7 @@ def clubb_std_prf (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsit
          maximum = np.max(A_field[:, levind:])
          ax.set_xlim(lest,maximum)
 
-         ax.set_ylim(bottom=top_level, top=1000)
+         ax.set_ylim(bottom=top_level, top=1000) 
          ax.set_xlabel('Value')
          ax.grid(True)
          ax.set_ylabel('Pressure Level (hPa)')
@@ -140,11 +123,11 @@ def clubb_std_prf (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsit
          ax.legend()
          ax.invert_yaxis()
 
-     title_text = pname+f"CLUBB VAR at {lons[ire]}E, {lats[ire]}N"
+     title_text = pname + f" VAR at {lons[ire]}E, {lats[ire]}N"
      fig.suptitle(title_text,fontsize=16, ha='center', va='center')
      plt.tight_layout(rect=[0, 0, 1, 0.96])
      plt.savefig(plotname+'.'+ptype, dpi=pixel)
      plt.close()
 
- return plotclubb
+ return plotstd
 
