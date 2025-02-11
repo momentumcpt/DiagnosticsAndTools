@@ -44,4 +44,6 @@ conda create -p yourname -c conda-forge  matplotlib xarray netcdf4 scipy pynio n
 Run:
 yourname/python CLUBB_PROF.py
 
+New observations created by EAM team and mapfiles can be download in https://web.lcrc.anl.gov/public/e3sm/diagnostic_output/ac.zguo/climatology/
+
 Zhun Guo 2025.2
