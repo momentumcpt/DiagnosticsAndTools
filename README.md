@@ -4,8 +4,10 @@ Quick start.
 diagnostic_v3_0 is a python diagnostic package primarily focused on vertical profiles of CAM and EAM.
 
 Its main program is CLUBB_PROF.py, where users can set parameters such as the diagnostic result name "case='whatever'", the diag output/plots directory "outdir=path0", the names of simulation results "cases=[name1,name2]", their original data directory "filepath=[path1,path2]", "years=[2005,1979]" for the start time and "nyear=[10,1]" for the duration of the run. "affl=[cam,eam]" is used to confirm the naming of the schema history file, which can be EAM, CAM, etc. "suffix=[h0a,h0,h1]" specifies the parameters for storing history files, such as h0, h1, h0a, etc. The climate files for output are stored in "climopath=" for vertical profile plots, while regridded climate files are stored in "regridpath=".  For each model runs, we can set calfvsite = [True (FV), False (SE)] , dpsc=[zm (ZM),nan (Silhs)] and mpsc= [MG, P3].
+
 pixel = 100 changes the res of plots.
 ptype = png or PDF or eps etc. NOTE wepage only supports 'png' format.
+csenson = "ANN" for annual mean
 
 The subroutines and their main functions include:
 
@@ -38,6 +40,7 @@ e.g. by changing the contents of these lists, users can specify the variables th
 
 How to install:
 conda create -p yourname -c conda-forge  matplotlib xarray netcdf4 scipy pynio numpy pyngl qt cartopy cmaps
+
 Run:
 yourname/python CLUBB_PROF.py
 
