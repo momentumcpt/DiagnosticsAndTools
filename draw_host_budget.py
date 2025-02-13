@@ -19,7 +19,7 @@ from matplotlib import font_manager as fm
 from scipy.interpolate import griddata
 from subprocess import call
 
-def draw_host_bgt (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsite, lats, lons, climopath, filepathobs,casedir,varis,cscale,chscale,pname,dpsc,mpsc,datapath,dofv):
+def draw_host_bgt (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsite, lats, lons, climopath, filepathobs,casedir,varis,cscale,chscale,pname,dpsc,mpsc,dofv, datapath):
 
 # ncases, the number of models
 # cases, the name of models
