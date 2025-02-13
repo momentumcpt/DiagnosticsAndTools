@@ -19,7 +19,7 @@ from matplotlib import font_manager as fm
 from scipy.interpolate import griddata
 from subprocess import call
 
-def draw_host_bgt (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsite, lats, lons, climopath, filepathobs,casedir,varis,cscale,chscale,pname,dpsc,mpsc,dofv, datapath):
+def draw_host_bgt (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsite, lats, lons, climopath, filepathobs,casedir,varis,cscale,chscale,pname,dpsc,mpsc,dofv,datapath):
 
 # ncases, the number of models
 # cases, the name of models
@@ -43,8 +43,8 @@ def draw_host_bgt (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsit
          if not os.path.exists(casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N'):
              os.mkdir(casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N')
 
-         plotname = casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N/E3SM_Budgets_'+casenames[im]+"_"+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
-         plothostbgt[im+ncases*ire] = 'E3SM_Budgets_'+casenames[im]+"_"+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
+         plotname = casedir+'/'+str(lons[ire])+'E_'+str(lats[ire])+'N/HOST_Budgets_'+casenames[im]+"_"+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
+         plothostbgt[im+ncases*ire] = 'HOST_Budgets_'+casenames[im]+"_"+str(lons[ire])+"E_"+str(lats[ire])+"N_"+cseason
 
          fig, axes = plt.subplots( nrows=nvaris//2, ncols=2, figsize=(15, 15 ))
          axes      = axes.flatten()
@@ -62,7 +62,11 @@ def draw_host_bgt (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsit
                      budget_ends.extend(["MPDQ"])
 
              if (varis[iv] == "T_PHY" ):
-                 budget_ends = ["TTEND_CLUBB"]
+                 if (dofv[im]):
+                     budget_ends = ["STEND_CLUBB"]
+                 else:
+                     budget_ends = ["TTEND_CLUBB"]
+
                  if (dpsc[im] == "zm" ):
                      budget_ends.extend(["ZMDT", "EVAPTZM", "ZMMTT"])
                  if (mpsc[im] == 'P3'):
@@ -93,7 +97,6 @@ def draw_host_bgt (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsit
 
              nterms = len (budget_ends)
 
-
              ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
              infiles[im]= climopath[im][0]+cases[im]+climopath[im][1]+cases[im]+'_'+cseason+'_climo.nc'
              inptrs = Dataset(infiles[im],'r')       # pointer to file1
@@ -106,6 +109,9 @@ def draw_host_bgt (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsit
              ncdf= Dataset(ncdfs[im],'r')
              n   =ncdf.variables['n'][:]
              idx_cols=ncdf.variables['idx_cols'][:,:]
+             if (dofv[im]):
+               idx_lats=ncdf.variables['idx_coord_lat'][:,:]
+               idx_lons=ncdf.variables['idx_coord_lon'][:,:]
              ncdf.close()
              A_field = np.zeros((nterms,nilev),np.float32)
              theunits=str(chscale[iv])+"x"+inptrs.variables[budget_ends[0]].units
@@ -123,7 +129,7 @@ def draw_host_bgt (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsit
                      else:
                         tmp=inptrs.variables[varis_bgt][0,:,npoint] 
                      tmp=tmp*cscale[iv]
-                     if (varis_bgt == "P3_mtend_TH" or varis_bgt == "STEND_CLUBB" ):
+                     if (varis_bgt == "P3_mtend_TH" ): #or varis_bgt == "STEND_CLUBB" ):
                         tmp=tmp/1004
                      A_field[it,:] = (A_field[it,:]+tmp[:]/n[ire]).astype(np.float32 )
 

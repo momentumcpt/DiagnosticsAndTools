@@ -34,11 +34,13 @@ def draw_clubb_bgt (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsi
  ncdfs    = ["" for x in range(ncases)]
  nregions = nsite
 
- varisobs = [ "CLOUD", "OMEGA","SHUM","CLWC_ISBL", "THATA","RELHUM"]
- nvaris = len(varis)
- cunits = ["%", "mba/day","g/kg","g/kg","K", "%", "mba/day", "K", "g/kg", "m/s", "m/s","K","m"]
- cscaleobs = [100., 100/86400., 1., 1000, 1., 1., 1, 1,1,1]
- obsdataset =["CCCM", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI","ERAI","ERAI"]
+ varisobs   = [ "CLOUD", "OMEGA","SHUM","CLWC_ISBL", "THATA","RELHUM"]
+ nvaris     = len(varis)
+ cunits     = ["%", "mba/day","g/kg","g/kg","K", "%", "mba/day", "K", "g/kg", "m/s", "m/s","K","m"]
+ cscaleobs  = [100., 100/86400., 1., 1000, 1., 1., 1, 1,1,1]
+ obsdataset = ["CCCM", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI", "ERAI","ERAI","ERAI"]
+ 
+ b_lev = 0 
 
  plotbgt=["" for x in range(nsite*ncases)] 
 
@@ -57,44 +59,95 @@ def draw_clubb_bgt (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsi
              ax = axes[iv]
 
              if (varis[iv] == "rtp2" or varis[iv] == "thlp2"):
-                 budget_ends = ["_bt", "_ma", "_ta", "_tp", "_dp1", "_dp2", "_cl", "_pd", "_sf", "_forcing"]
+                 if (b_lev == 2 ):
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_dp1', '_dp2', '_pd', '_cl', '_sf', '_forcing', '_mc']
+                 elif (b_lev == 1) :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_dp1', '_dp2', '_cl', '_mc']
+                 else :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_dp1', '_dp2', '_cl' ]
                  nterms = len (budget_ends)
+
              if (varis[iv] == 'upwp' or varis[iv] == "vpwp"):
-                 budget_ends = ["_bt", "_ma", "_ta", "_tp", "_ac","_bp","_pr1","_pr2", "_pr3","_pr4", "_dp1","_mfl", "_cl"]
-                 nterms = len(budget_ends)
+                 if (b_lev == 2 ):
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_ac', '_bp', '_pr1', '_pr2', '_pr3', '_pr4', '_dp1', '_mlf', '_cl', '_mc']
+                 elif (b_lev == 1) :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_ac', '_bp', '_pr1', '_pr2', '_pr3', '_pr4', '_dp1',  '_cl', '_mc']
+                 else :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_ac', '_bp', '_pr1', '_pr2', '_pr3', '_pr4', '_dp1', '_cl' ]
+                 nterms = len (budget_ends)
+
              if (varis[iv] == "wprtp") :
-                 budget_ends = ["_bt", "_ma", "_ta", "_tp", "_ac","_bp","_pr1","_pr2", "_pr3","_dp1","_mfl", "_cl", "_sicl","_pd", "_forcing"]
+                 if (b_lev == 2 ):
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_ac', '_bp', '_pr1', '_pr2', '_pr3', '_dp1', '_mlf', '_cl', '_sicl', '_pd', '_forcing', '_mc']
+                 elif (b_lev == 1) :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_ac', '_bp', '_pr1', '_pr2', '_pr3', '_dp1',  '_cl',  '_mc']
+                 else :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_ac', '_bp', '_pr1', '_pr2', '_pr3', '_dp1',  '_cl' ]
                  nterms = len (budget_ends)
 
              if (varis[iv] == "wpthlp") :
-                 budget_ends = ["_bt", "_ma", "_ta", "_tp", "_ac","_bp","_pr1","_pr2", "_pr3","_dp1","_mfl", "_cl", "_sicl", "_forcing"]
+                 if (b_lev == 2 ):
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_ac', '_bp', '_pr1', '_pr2', '_pr3', '_dp1', '_mlf', '_cl', '_sicl',  '_forcing', '_mc']
+                 elif (b_lev == 1) :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_ac', '_bp', '_pr1', '_pr2', '_pr3', '_dp1',  '_cl',  '_mc']
+                 else :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_ac', '_bp', '_pr1', '_pr2', '_pr3', '_dp1',  '_cl' ]
                  nterms = len (budget_ends)
 
              if (varis[iv] == "rtpthlp") :
-                 budget_ends = ["_bt", "_ma", "_ta", "_tp1","_tp2","_dp1","_dp2", "_cl", "_sf", "_forcing"]
+                 if (b_lev == 2 ): 
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp1', '_tp2', '_dp1', '_dp2', '_cl', '_sf', '_forcing', '_mc']
+                 elif (b_lev == 1) :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp1', '_tp2', '_dp1', '_dp2', '_cl', '_mc' ]
+                 else :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp1', '_tp2', '_dp1', '_dp2', '_cl' ]
                  nterms = len (budget_ends)
 
              if (varis[iv] == "wp2") :
                  budget_ends = ["_bt", "_ma", "_ta", "_ac","_bp","_pr1","_pr2", "_pr3","_dp1","_dp2", "_cl", "_pd", "_sf"]
+                 if (b_lev == 2 ): 
+                    budget_ends = ['_bt', '_ma', '_ta', '_ac', '_bp', '_pr1', '_pr2', '_pr3', '_dp1', '_dp2', '_sdmp', '_pd', '_cl', '_sf', '_splat']
+                 elif (b_lev == 1) :
+                    budget_ends = ['_bt', '_ma', '_ta', '_ac', '_bp', '_pr1', '_pr2', '_pr3', '_dp1', '_dp2',  '_cl' , '_splat' ]
+                 else :
+                    budget_ends = ['_bt', '_ma', '_ta', '_ac', '_bp', '_pr1', '_dp1', '_dp2',  '_cl'  ]
                  nterms = len (budget_ends)
 
              if (varis[iv] == "wp3") :
-              #   budget_ends = ["_bt", "_ma", "_ta", "_tp", "_ac","_bp1","_bp2","_pr1","_pr2","_dp1", "_cl"]
-                 budget_ends = ["_bt", "_ma", "_ta", "_tp", "_ac","_bp1","_pr1","_pr2","_dp1", "_cl"]
+                 if (b_lev == 2 ):
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_ac', '_bp1', '_pr1', '_pr2', '_pr3', '_dp1', '_sdmp', '_cl', '_splat']
+                 elif (b_lev == 1) :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_ac', '_bp1', '_pr1', '_pr2', '_dp1', '_cl' , '_splat']
+                 else :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_ac', '_bp1', '_pr1', '_pr2', '_dp1', '_cl' ]
                  nterms = len (budget_ends)
 
              if (varis[iv] == "up2" or varis[iv] == "vp2") :
-                 budget_ends = ["_bt", "_ma", "_ta", "_tp", "_dp1", "_dp2","_pr1","_pr2" ,"_cl", "_pd", "_sf"]
+                 if (b_lev == 2 ):
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_dp1', '_dp2', '_pr1', '_pr2', '_cl', '_pd', '_sf', '_sdmp', '_splat']
+                 elif (b_lev == 1) :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_dp1', '_dp2', '_pr1', '_pr2', '_cl' , '_splat']
+                 else :
+                    budget_ends = ['_bt', '_ma', '_ta', '_tp', '_dp1', '_dp2', '_pr1', '_pr2', '_cl' ]
                  nterms = len (budget_ends)
 
              if (varis[iv] == "um" or varis[iv] == "vm") :
-                 budget_ends = ["_bt", "_ma","_ta","_gf",  "_f"]
+                 if (b_lev == 2 ):
+                    budget_ends = ['_bt', '_ma', '_gf', '_cf', '_ta', '_f', '_sdmp', '_ndg', '_mfl']
+                 elif (b_lev == 1) :
+                    budget_ends = ['_bt', '_ma', '_gf', '_cf', '_ta', '_f']
+                 else :
+                    budget_ends = ['_bt', '_ma', '_gf', '_cf', '_ta']
                  nterms = len (budget_ends)
 
              if (varis[iv] == "thlm" or varis[iv] == "rtm") :
-                 budget_ends = ["_bt", "_ma","_ta","_cl",  "_mc"]
+                 if (b_lev == 2 ):
+                    budget_ends = ['_bt', '_ma', '_ta', '_cl',  '_mc', '_mfl', '_tacl', '_forcing','_sdmp' ]
+                 elif (b_lev == 1) :
+                    budget_ends = ['_bt', '_ma', '_ta', '_cl',  '_mc']
+                 else :
+                    budget_ends = ['_bt', '_ma', '_ta', '_cl']
                  nterms = len (budget_ends)
-
 
              ncdfs[im]  = datapath+cases[im]+'_site_location.nc'
              infiles[im]= climopath[im][0]+cases[im]+climopath[im][1]+cases[im]+'_'+cseason+'_climo.nc'
@@ -133,8 +186,9 @@ def draw_clubb_bgt (ptype,pixel,cseason,top_level, ncases, cases, casenames, nsi
                      tmp=tmp*cscale[iv]
                      A_field[it,:] = (A_field[it,:]+tmp[:]/n[ire]).astype(np.float32 )
 
+                 ax.plot(A_field[it, :],ilev, label=varis_bgt[:])
              inptrs.close()
-             ax.set_title(f'({varis[iv] if iv < len(varis) else "Unknown"})') 
+             ax.set_title(f'({varis[iv] if iv < len(varis) else "Unknown"})')
              levind= top_level//1000*72
              if (np.abs(np.min(A_field[:, levind:])) <= 0.001*np.abs(np.max(A_field[:, levind:]))):
                  lest=0
